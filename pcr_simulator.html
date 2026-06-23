@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCR Simulator - Genetics Virtual Lab</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--bg:#07152f;--card:#fffdf8;--ink:#172033;--muted:#64748b;--line:#dbe3ef;--teal:#14b8a6;--cyan:#38bdf8;--green:#22c55e;--gold:#f59e0b;--red:#ef4444;--shadow:0 18px 45px rgba(7,21,47,.18)}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at top left,rgba(56,189,248,.24),transparent 32%),radial-gradient(circle at 80% 10%,rgba(20,184,166,.25),transparent 28%),linear-gradient(180deg,#07152f 0%,#0b1020 38%,#f5f7fb 38%,#f8fafc 100%)}header{color:white;padding:34px 20px 26px;text-align:center;position:relative;overflow:hidden}header:before{content:"";position:absolute;inset:0;opacity:.12;background-image:linear-gradient(90deg,transparent 0 48%,rgba(255,255,255,.5) 48% 52%,transparent 52%),radial-gradient(circle,white 1px,transparent 1px);background-size:120px 120px,24px 24px}header>*{position:relative}h1{margin:0;font-size:clamp(2rem,5vw,4rem);letter-spacing:.3px}header p{margin:10px auto 0;max-width:860px;font-size:1.05rem;opacity:.92}.topbar{max-width:1320px;margin:0 auto;padding:16px 20px 0;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.brand{color:white;display:flex;gap:12px;align-items:center;font-weight:900}.logo{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:16px;background:linear-gradient(135deg,#69f0d0,#66c7ff);color:#07152f;font-weight:1000;box-shadow:0 10px 25px rgba(0,0,0,.22)}.backBtn{display:inline-flex;align-items:center;gap:10px;padding:11px 16px;border-radius:16px;text-decoration:none;color:white;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);font-weight:900;transition:.18s transform,.18s background}.backBtn:hover{transform:translateY(-2px);background:rgba(255,255,255,.18)}.wrap{max-width:1320px;margin:0 auto;padding:22px}.grid{display:grid;grid-template-columns:390px 1fr;gap:18px;align-items:start}@media(max-width:980px){.grid{grid-template-columns:1fr}.sticky{position:static!important}}.card{background:rgba(255,253,248,.96);border:1px solid rgba(219,227,239,.9);border-radius:24px;padding:18px;box-shadow:var(--shadow);backdrop-filter:blur(5px)}.sticky{position:sticky;top:16px}h2{margin:0 0 12px;font-size:1.35rem}h3{margin:14px 0 8px;font-size:1rem}.small{font-size:.88rem;color:var(--muted);line-height:1.45}.section{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}label{display:block;margin:10px 0 5px;font-weight:850;font-size:.92rem}textarea,input,select{width:100%;border:1px solid #cbd5e1;border-radius:14px;padding:11px 12px;font:inherit;background:white;color:var(--ink)}textarea{min-height:140px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}button{border:0;border-radius:16px;padding:12px 16px;cursor:pointer;font-weight:900;color:white;background:linear-gradient(135deg,#0f766e,#14b8a6);box-shadow:0 12px 24px rgba(20,184,166,.22);transition:.15s transform,.15s filter,.15s box-shadow}button:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 16px 30px rgba(20,184,166,.28)}button.secondary{background:linear-gradient(135deg,#2563eb,#38bdf8)}button.gold{background:linear-gradient(135deg,#b45309,#f59e0b)}button.danger{background:linear-gradient(135deg,#991b1b,#ef4444)}button.ghost{background:#eef2f7;color:#0f172a;box-shadow:none}button:disabled{opacity:.45;cursor:not-allowed;transform:none}.btnbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.notice{margin-top:12px;padding:12px 14px;border-radius:16px;background:#eff6ff;border-left:6px solid #38bdf8;color:#0f172a;line-height:1.45}.notice.good{background:#ecfdf5;border-left-color:#22c55e}.notice.bad{background:#fef2f2;border-left-color:#ef4444}.notice.warn{background:#fffbeb;border-left-color:#f59e0b}.primerRow{display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;margin-bottom:8px}.primerRow span{font-weight:900;color:#475569}.tableWrap{overflow:auto}table{width:100%;border-collapse:collapse;background:white;border-radius:18px;overflow:hidden;border:1px solid #e2e8f0}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top;font-size:.9rem}th{background:#eaf7f6;color:#0f3f46;font-weight:950}tr:last-child td{border-bottom:0}.tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;background:#e0f2fe;color:#075985;font-size:.75rem;font-weight:900;margin:2px}.tag.good{background:#dcfce7;color:#166534}.gelPanel{background:radial-gradient(circle at top left,rgba(125,211,252,.2),transparent 26%),linear-gradient(180deg,#111827,#0f172a);color:white;border-radius:24px;padding:18px;box-shadow:var(--shadow)}.gelWrap{display:grid;grid-template-columns:170px 1fr;gap:14px;align-items:start}@media(max-width:720px){.gelWrap{grid-template-columns:1fr}}.fragmentBank{min-height:180px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:12px}.fragChip{user-select:none;display:flex;justify-content:space-between;gap:8px;align-items:center;margin:7px 0;padding:7px 9px;border-radius:14px;background:linear-gradient(135deg,#f8fafc,#dbeafe);color:#0f172a;font-weight:850;font-size:.82rem;line-height:1.05;cursor:grab;box-shadow:0 8px 18px rgba(0,0,0,.18)}.gel{position:relative;min-height:560px;background:linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px),linear-gradient(180deg,rgba(148,163,184,.24),rgba(15,23,42,.65));background-size:calc(100% / 8) 100%,100% 100%;border:2px solid rgba(255,255,255,.22);border-radius:22px;overflow:hidden;padding:26px 18px 18px}.wells{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;height:36px;position:relative;z-index:3}.well{border-radius:0 0 12px 12px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:#cbd5e1;font-weight:900;text-align:center;padding-top:8px;font-size:.78rem}.laneLabels{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:8px 0 0;color:#e2e8f0;font-size:.75rem;font-weight:900;text-align:center}.lanes{position:absolute;inset:76px 18px 22px;display:grid;grid-template-columns:repeat(6,1fr);gap:14px}.lane{position:relative;border-left:1px dashed rgba(255,255,255,.13);border-right:1px dashed rgba(255,255,255,.13);border-radius:14px}.band{position:absolute;left:10%;width:80%;height:10px;border-radius:999px;background:rgba(125,249,255,.86);box-shadow:0 0 12px rgba(125,249,255,.88),0 0 26px rgba(125,249,255,.35);transform:translateY(-50%)}.band.ladder{background:rgba(255,255,255,.95);box-shadow:0 0 12px rgba(255,255,255,.9);height:7px;z-index:5}.band.expected{background:rgba(34,197,94,.9);box-shadow:0 0 14px rgba(34,197,94,.78)}.dropBand{position:absolute;left:8%;right:8%;height:18px;border-radius:999px;border:2px dashed rgba(255,255,255,.45);background:rgba(255,255,255,.08);transform:translateY(-50%)}.dropBand.filled{border-style:solid;background:rgba(34,197,94,.28);border-color:#22c55e}.dropBand.wrong{border-color:#ef4444;background:rgba(239,68,68,.25)}.markerLabel{position:absolute;left:6px;transform:translateY(-50%);color:#ffffff;font-size:.66rem;font-weight:950;text-shadow:0 0 8px rgba(255,255,255,.9),0 1px 2px rgba(0,0,0,.95);white-space:nowrap;z-index:30;background:rgba(15,23,42,.88);border-radius:7px;padding:1px 4px;min-width:32px;text-align:right;pointer-events:none}.footer{text-align:center;color:#64748b;padding:26px;font-size:.9rem}.hide{display:none!important}.sequencePreview{max-height:160px;overflow:auto;padding:10px;border-radius:14px;background:#0f172a;color:#d1fae5;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem;line-height:1.45;word-break:break-all}.stepBadge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:950;background:#dbeafe;color:#1e3a8a;margin-bottom:10px}code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.83rem;color:#0f766e}
+
+.buyCoffeeWrap{
+  text-align:center;
+  margin-top:18px;
+}
+.buyCoffeeWrap img{
+  transition:transform .22s ease, box-shadow .22s ease;
+  border-radius:14px;
+}
+.buyCoffeeWrap img:hover{
+  transform:translateY(-3px) scale(1.04);
+  box-shadow:0 12px 28px rgba(0,0,0,.22);
+}
+
+</style>
+</head>
+<body>
+<div class="topbar"><div class="brand"><div class="logo">AP</div><div>Genetics Virtual Lab<br><span style="font-size:.78rem;opacity:.78">PCR Simulator v1</span></div></div><a class="backBtn" href="virtual_lab.html">← Back to Genetics Virtual Lab</a></div>
+<header><h1>🧬 PCR Simulator</h1><p>Upload up to five FASTA DNA sequences, test up to three primers, predict PCR products for each individual, build a gel electrophoresis result, and export a student report.</p></header>
+<div class="wrap grid"><aside class="card sticky"><span class="stepBadge">1 · DNA template</span><h2>Input DNA sequence</h2><p class="small">Upload up to five <b>.txt</b>, <b>.fas</b>, or <b>.fasta</b> files. Each file represents one sample. Maximum length per sample: <b>30,000 bases</b>.</p>
+<label>Sample 1</label>
+<input type="file" id="fileInput1" accept=".txt,.fas,.fasta,.fa,text/plain">
+
+<label>Sample 2</label>
+<input type="file" id="fileInput2" accept=".txt,.fas,.fasta,.fa,text/plain">
+
+<label>Sample 3</label>
+<input type="file" id="fileInput3" accept=".txt,.fas,.fasta,.fa,text/plain">
+
+<label>Sample 4</label>
+<input type="file" id="fileInput4" accept=".txt,.fas,.fasta,.fa,text/plain">
+
+<label>Sample 5</label>
+<input type="file" id="fileInput5" accept=".txt,.fas,.fasta,.fa,text/plain">
+
+<div class="notice warn">
+<b>Upload only mode enabled.</b> Upload one FASTA file per sample. Manual sequence pasting is disabled for this activity.
+</div>
+
+<div class="btnbar">
+<button onclick="loadSequence()">Load uploaded samples</button>
+<button class="ghost" onclick="clearAll()">Reset</button>
+</div><div id="seqStats" class="notice hide"></div><div class="section"><span class="stepBadge">2 · Primers</span><h2>Input primers</h2><p class="small">Paste up to three primers. The simulator tests all primer-pair orientations and reports predicted amplicons.</p><div class="primerRow"><span>Primer 1</span><input id="primer1" placeholder="e.g., ATGCGTAC"></div><div class="primerRow"><span>Primer 2</span><input id="primer2" placeholder="e.g., TTACGCAA"></div><div class="primerRow"><span>Primer 3</span><input id="primer3" placeholder="optional"></div><div class="btnbar"><button class="secondary" onclick="performPCR()">Perform PCR</button></div><div id="primerMsg" class="notice hide"></div></div><div class="section"><span class="stepBadge">5 · Export</span><h2>Student report</h2><p class="small">After checking the gel, export a PDF report. Student name and NSID are required.</p><div class="btnbar"><button class="gold" id="exportBtn" onclick="exportPDF()" disabled>Export PDF</button></div><div id="exportMsg" class="notice hide"></div></div></aside><main><section class="card"><span class="stepBadge">3 · PCR results</span><h2>PCR product table</h2><div id="resultSummary" class="notice warn">Load a DNA sequence and primers, then click <b>Perform PCR</b>.</div><div id="resultsTable" class="tableWrap" style="margin-top:12px"></div></section><section class="card" style="margin-top:18px"><span class="stepBadge">4 · Gel electrophoresis practice</span><h2>Drag expected fragments to the gel</h2><p class="small">The 50 bp ladder is shown in lane L. Drag each predicted PCR product into the matching sample lane. Smaller fragments migrate farther down the gel.</p><div class="gelPanel" id="gelReportArea"><div class="gelWrap"><div class="fragmentBank"><h3 style="margin-top:0;color:white">Fragment bank</h3><p class="small" style="color:#cbd5e1">Drag predicted amplicons into lanes 1–5.</p><div id="fragmentBank"></div></div><div class="gel" id="gel"><div class="wells"><div class="well">L</div><div class="well">Individual 1</div><div class="well">Individual 2</div><div class="well">Individual 3</div><div class="well">Individual 4</div><div class="well">Individual 5</div></div><div class="laneLabels"><div>50 bp ladder</div><div>Individual 1</div><div>Individual 2</div><div>Individual 3</div><div>Individual 4</div><div>Individual 5</div></div><div class="lanes" id="lanes"><div class="lane" data-lane="0" id="lane0"></div><div class="lane" data-lane="1" id="lane1"></div><div class="lane" data-lane="2" id="lane2"></div><div class="lane" data-lane="3" id="lane3"></div><div class="lane" data-lane="4" id="lane4"></div><div class="lane" data-lane="5" id="lane5"></div></div></div></div></div><div class="btnbar"><button onclick="checkGel()">Check gel</button><button class="ghost" onclick="resetGelPractice()">Reset gel</button><button class="ghost" onclick="revealGel()">Reveal expected gel</button></div><div id="gelMsg" class="notice hide"></div></section><section class="card" style="margin-top:18px"><span class="stepBadge">Reference</span><h2>How the simulator interprets PCR</h2><p class="small">The app searches both DNA strands. A valid product requires two primers facing each other on opposite strands. Amplicon length is calculated from the outer primer binding positions. This is a teaching simulator and does not evaluate melting temperature, primer dimers, mismatches, salt concentration, or polymerase-specific conditions.</p><div id="sequencePreview" class="sequencePreview hide"></div></section></main></div>
+<div class="buyCoffeeWrap">
+<div style="text-align:center; margin-top:15px;">
+  <a href="https://www.buymeacoffee.com/ampossot" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ampossot&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
+  </a>
+</div>
+</div>
+<div class="footer">Dr. Andres Posso-Terranova. 2026. © · Genetics Virtual Lab</div>
+<script>
+let templates=[],template="",templateName="Untitled sequence",pcrProducts=[],placedBands={},gelChecked=false;
+const MAX_BASES=30000;
+const ladder50=[50,100,150,200,250,300,400,500,600,700,800,900,1000,1200,1500,2000,2500,3000];
+
+async function readSampleFile(inputId, sampleNumber){
+  const input=document.getElementById(inputId);
+  const file=input && input.files ? input.files[0] : null;
+  if(!file) return null;
+
+  if(!/\.(txt|fas|fasta|fa)$/i.test(file.name)){
+    return {error:`Sample ${sampleNumber}: unsupported file type.`};
+  }
+
+  const text=await file.text();
+  const parsed=cleanDNA(text);
+
+  if(!parsed.seq){
+    return {error:`Sample ${sampleNumber}: no valid DNA sequence found.`};
+  }
+
+  let seq=parsed.seq;
+  let trimmed=false;
+  if(seq.length>MAX_BASES){
+    seq=seq.slice(0,MAX_BASES);
+    trimmed=true;
+  }
+
+  return {
+    sampleNumber,
+    name:file.name,
+    fastaName:parsed.name || file.name,
+    seq,
+    trimmed
+  };
+}
+
+function cleanDNA(raw){if(!raw)return{name:"Untitled sequence",seq:""};let name="Untitled sequence",seqLines=[];raw.replace(/\r/g,"").split("\n").forEach(line=>{const t=line.trim();if(!t)return;if(t.startsWith(">")){if(name==="Untitled sequence")name=t.replace(/^>/,"").trim()||name;return}seqLines.push(t)});return{name,seq:seqLines.join("").replace(/[^ACGTNacgtn]/g,"").toUpperCase()}}
+function revComp(seq){const map={A:"T",T:"A",C:"G",G:"C",N:"N"};return seq.toUpperCase().split("").reverse().map(b=>map[b]||"N").join("")}
+function gcContent(seq){if(!seq.length)return 0;return(100*((seq.match(/[GC]/g)||[]).length)/seq.length).toFixed(1)}
+function loadSequence(){
+  return (async ()=>{
+    templates=[];
+    const errors=[];
+    const results=[];
+
+    for(let i=1;i<=5;i++){
+      const result=await readSampleFile(`fileInput${i}`, i);
+      if(!result) continue;
+      if(result.error){errors.push(result.error); continue;}
+      results.push(result);
+    }
+
+    templates=results;
+
+    template=templates[0] ? templates[0].seq : "";
+    templateName=templates[0] ? templates[0].name : "Untitled sequence";
+
+    pcrProducts=[];
+    placedBands={};
+    gelChecked=false;
+    document.getElementById("exportBtn").disabled=true;
+    document.getElementById("resultsTable").innerHTML="";
+    document.getElementById("fragmentBank").innerHTML="";
+    document.getElementById("resultSummary").className="notice warn";
+    document.getElementById("resultSummary").innerHTML="Load samples and primers, then click <b>Perform PCR</b>.";
+    renderGel();
+
+    if(!templates.length){
+      show("seqStats", errors.length ? errors.join("<br>") : "Upload at least one FASTA file.", "bad");
+      return;
+    }
+
+    let preview=templates.map(t=>`>Sample ${t.sampleNumber}: ${t.name}\n${formatSeq(t.seq.slice(0,220))}${t.seq.length>220 ? "\n... preview truncated ..." : ""}`).join("\n\n");
+    document.getElementById("sequencePreview").classList.remove("hide");
+    document.getElementById("sequencePreview").textContent=preview;
+
+    const trimMsg=templates.some(t=>t.trimmed) ? " Some sequences were trimmed to 30,000 bases." : "";
+    const errMsg=errors.length ? "<br>" + errors.join("<br>") : "";
+    show("seqStats",`${templates.length} sample(s) loaded successfully.${trimMsg}${errMsg}`, errors.length ? "warn" : "good");
+  })();
+}
+function formatSeq(seq){return seq.match(/.{1,70}/g)?.join("\n")||seq}function validatePrimer(seq){return(seq||"").replace(/\s+/g,"").toUpperCase().replace(/[^ACGTN]/g,"")}function primerList(){return[1,2,3].map(i=>({id:i,seq:validatePrimer(document.getElementById(`primer${i}`).value)})).filter(p=>p.seq.length>0)}function findAll(haystack,needle){const hits=[];if(!needle||needle.includes("N"))return hits;let pos=haystack.indexOf(needle);while(pos!==-1){hits.push(pos);pos=haystack.indexOf(needle,pos+1)}return hits}
+function performPCR(){
+if(!templates.length){
+show("primerMsg","Load uploaded samples first.","bad");
+return
+}
+
+const primers=primerList();
+
+if(primers.length<2){
+show("primerMsg","Enter at least two primers.","bad");
+return
+}
+
+const tooShort=primers.find(p=>p.seq.length<5);
+if(tooShort){
+show("primerMsg",`Primer ${tooShort.id} is very short. Use at least 5 bases.`, "bad");
+return
+}
+
+pcrProducts=[];
+placedBands={};
+gelChecked=false;
+document.getElementById("exportBtn").disabled=true;
+
+let productCounter=1;
+
+templates.slice(0,5).forEach((individual)=>{
+
+for(let i=0;i<primers.length;i++){
+for(let j=0;j<primers.length;j++){
+if(i===j) continue;
+
+const fwd=primers[i];
+const rev=primers[j];
+const revBinding=revComp(rev.seq);
+const fwdHits=findAll(individual.seq,fwd.seq);
+const revHits=findAll(individual.seq,revBinding);
+
+fwdHits.forEach(startF=>{
+revHits.forEach(startR=>{
+if(startF<startR){
+const endR=startR+rev.seq.length;
+const size=endR-startF;
+
+if(size>0 && size<=1000){
+pcrProducts.push({
+productNo:productCounter++,
+forwardPrimer:`Primer ${fwd.id}`,
+reversePrimer:`Primer ${rev.id}`,
+forwardSeq:fwd.seq,
+reverseSeq:rev.seq,
+start:startF+1,
+end:endR,
+size:size,
+amplicon:individual.seq.slice(startF,endR),
+individual:`Sample ${individual.sampleNumber}`,
+sampleNumber:individual.sampleNumber,
+templateName:individual.name
+});
+}
+}
+})
+})
+}
+}
+});
+
+renderProductTable(pcrProducts);
+renderGel();
+renderFragmentBank();
+
+if(!pcrProducts.length){
+show("resultSummary","No PCR products found.","bad");
+show("primerMsg","PCR completed: no PCR product found within the 1,000 bp limit.","warn");
+return
+}
+
+show("resultSummary",`PCR completed. ${pcrProducts.length} product(s) were detected. Drag each PCR product to its corresponding sample lane.`, "good");
+show("primerMsg","PCR products generated. Now drag each product into the matching sample lane.","good");
+}
+function renderProductTable(products){
+if(!products.length){
+document.getElementById("resultsTable").innerHTML='<table><thead><tr><th>Sample</th><th>Result</th></tr></thead><tbody><tr><td>All loaded samples</td><td><b>No PCR product found</b></td></tr></tbody></table>';
+return;
+}
+document.getElementById("resultsTable").innerHTML=`<table><thead><tr><th>Sample</th><th>Forward primer</th><th>Reverse primer</th><th>Template position</th><th>Size</th><th>GC</th></tr></thead><tbody>${products.map(p=>`<tr><td><b>${p.individual}</b><br><span class="tag good">gel practice</span></td><td>${p.forwardPrimer}<br><code>${p.forwardSeq}</code></td><td>${p.reversePrimer}<br><code>${p.reverseSeq}</code></td><td>${p.start.toLocaleString()} – ${p.end.toLocaleString()}</td><td><b>${p.size.toLocaleString()} bp</b></td><td>${gcContent(p.amplicon)}%</td></tr>`).join("")}</tbody></table>`;
+}
+function sizeToY(size){const min=50,max=Math.max(3000,...pcrProducts.map(p=>p.size),...ladder50),logMin=Math.log10(min),logMax=Math.log10(max),logSize=Math.log10(Math.max(min,Math.min(size,max))),ratio=(logSize-logMin)/(logMax-logMin);return 94-ratio*84}
+function renderGel(){
+[0,1,2,3,4,5].forEach(i=>{
+const lane=document.getElementById(`lane${i}`);
+if(lane){
+lane.innerHTML="";
+lane.ondragover=null;
+lane.ondrop=null;
+}
+});
+
+const lane0=document.getElementById("lane0");
+if(lane0){
+ladder50.forEach(bp=>{
+const band=document.createElement("div");
+band.className="band ladder";
+band.style.top=`${sizeToY(bp)}%`;
+band.style.left="34%";
+band.style.width="60%";
+band.title=`${bp} bp`;
+lane0.appendChild(band);
+
+if([50,100,200,500,1000,1500,2000,3000].includes(bp)){
+const label=document.createElement("div");
+label.className="markerLabel";
+label.style.top=`${sizeToY(bp)}%`;
+label.textContent=`${bp}`;
+lane0.appendChild(label);
+}
+});
+}
+
+[1,2,3,4,5].forEach(laneNo=>{
+const lane=document.getElementById(`lane${laneNo}`);
+if(!lane) return;
+lane.ondragover=e=>e.preventDefault();
+lane.ondrop=dropFragment;
+
+const products=pcrProducts.filter(p=>p.sampleNumber===laneNo);
+products.forEach(product=>{
+const target=document.createElement("div");
+target.className="dropBand";
+target.dataset.product=product.productNo;
+target.style.top=`${sizeToY(product.size)}%`;
+lane.appendChild(target);
+});
+});
+}
+function renderFragmentBank(){
+const box=document.getElementById("fragmentBank");
+
+if(!pcrProducts.length){
+box.innerHTML='<div class="small" style="color:#cbd5e1">No products available.</div>';
+return;
+}
+
+box.innerHTML=pcrProducts.map(p=>`<div class="fragChip" draggable="true" ondragstart="dragFragment(event)" data-product="${p.productNo}" data-size="${p.size}"><span>${p.individual}</span><span>${p.size} bp</span></div>`).join("");
+}
+function dragFragment(e){e.dataTransfer.setData("text/plain",JSON.stringify({product:Number(e.target.dataset.product),size:Number(e.target.dataset.size)}))}
+function dropFragment(e){
+e.preventDefault();
+const lane=e.currentTarget;
+const laneNo=Number(lane.dataset.lane);
+if(laneNo<1) return;
+
+const data=JSON.parse(e.dataTransfer.getData("text/plain"));
+if(!placedBands[laneNo]) placedBands[laneNo]=[];
+if(!placedBands[laneNo].includes(data.product)) placedBands[laneNo].push(data.product);
+
+lane.querySelectorAll(`.band.expected[data-product="${data.product}"]`).forEach(x=>x.remove());
+lane.querySelectorAll(`.dropBand[data-product="${data.product}"]`).forEach(x=>x.classList.remove("filled","wrong"));
+
+const product=pcrProducts.find(p=>p.productNo===data.product);
+if(!product) return;
+
+const band=document.createElement("div");
+band.className="band expected";
+band.dataset.product=data.product;
+band.style.top=`${sizeToY(product.size)}%`;
+band.title=`${product.individual}: ${product.size} bp`;
+lane.appendChild(band);
+
+const target=lane.querySelector(`.dropBand[data-product="${data.product}"]`);
+if(target) target.classList.add("filled");
+}
+function checkGel(){
+if(!pcrProducts.length){
+show("gelMsg","No PCR products to check yet.","bad");
+return;
+}
+
+let correct=0;
+
+pcrProducts.forEach(p=>{
+const laneNo=p.sampleNumber;
+const lane=document.getElementById(`lane${laneNo}`);
+const expected=p.productNo;
+const actual=placedBands[laneNo] || [];
+
+if(lane){
+lane.querySelectorAll(".dropBand").forEach(t=>{
+t.classList.remove("wrong");
+if(Number(t.dataset.product)===expected && actual.includes(expected)) t.classList.add("filled");
+if(actual.length && !actual.includes(expected) && Number(t.dataset.product)===expected) t.classList.add("wrong");
+});
+}
+
+if(actual.includes(expected)) correct++;
+});
+
+if(correct===pcrProducts.length){
+gelChecked=true;
+document.getElementById("exportBtn").disabled=false;
+show("gelMsg",`Correct. ${correct}/${pcrProducts.length} PCR product(s) were placed in the correct sample lane. Export is now available.`, "good");
+}else{
+gelChecked=false;
+document.getElementById("exportBtn").disabled=true;
+show("gelMsg",`${correct}/${pcrProducts.length} correct. Drag each PCR product to its matching sample lane.`, "bad");
+}
+}
+function resetGelPractice(){placedBands={};gelChecked=false;document.getElementById("exportBtn").disabled=true;renderGel();renderFragmentBank();show("gelMsg","Gel practice reset. Drag the fragments again.","warn")}
+function revealGel(){
+placedBands={};
+
+renderGel();
+
+pcrProducts.forEach(p=>{
+if(!placedBands[p.sampleNumber]) placedBands[p.sampleNumber]=[];
+placedBands[p.sampleNumber].push(p.productNo);
+const lane=document.getElementById(`lane${p.sampleNumber}`);
+if(!lane) return;
+
+const band=document.createElement("div");
+band.className="band expected";
+band.style.top=`${sizeToY(p.size)}%`;
+band.title=`${p.individual}: ${p.size} bp`;
+lane.appendChild(band);
+
+const target=lane.querySelector(`.dropBand[data-product="${p.productNo}"]`);
+if(target) target.classList.add("filled");
+});
+
+gelChecked=true;
+document.getElementById("exportBtn").disabled=false;
+show("gelMsg","Expected gel revealed. Export is now available.","good");
+}
+
+async function exportPDF() {
+  if (!gelChecked) {
+    show("exportMsg", "Check the gel correctly before exporting.", "bad");
+    return;
+  }
+
+  let studentName = prompt("Enter Student Name:");
+  if (!studentName) {
+    alert("Student Name is required.");
+    return;
+  }
+
+  let nsid = prompt("Enter NSID:");
+  if (!nsid) {
+    alert("NSID is required.");
+    return;
+  }
+
+  if (typeof html2canvas === "undefined" || typeof window.jspdf === "undefined") {
+    alert("PDF export libraries did not load. Please check your internet connection and try again.");
+    return;
+  }
+
+  show("exportMsg", "Generating PDF report...", "warn");
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 14;
+  let y = margin;
+
+  const now = new Date();
+  const timestamp = now.toLocaleString("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
+  function addPageIfNeeded(extraHeight) {
+    if (y + extraHeight > pageHeight - margin) {
+      pdf.addPage();
+      y = margin;
+    }
+  }
+
+  function addText(text, x, fontSize = 10, style = "normal", maxWidth = pageWidth - margin * 2) {
+    pdf.setFont("helvetica", style);
+    pdf.setFontSize(fontSize);
+    const lines = pdf.splitTextToSize(String(text), maxWidth);
+    addPageIfNeeded(lines.length * (fontSize * 0.42) + 4);
+    pdf.text(lines, x, y);
+    y += lines.length * (fontSize * 0.42) + 4;
+  }
+
+  function drawTable(headers, rows, colWidths) {
+    const rowHeight = 9;
+    const headerHeight = 10;
+    const tableX = margin;
+
+    addPageIfNeeded(headerHeight + rowHeight + 6);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(8.3);
+    pdf.setFillColor(234, 247, 246);
+    pdf.setDrawColor(190, 205, 215);
+    pdf.rect(tableX, y, colWidths.reduce((a,b)=>a+b,0), headerHeight, "FD");
+
+    let x = tableX;
+    headers.forEach((h, i) => {
+      pdf.text(String(h), x + 2, y + 6.5, { maxWidth: colWidths[i] - 4 });
+      if (i > 0) pdf.line(x, y, x, y + headerHeight);
+      x += colWidths[i];
+    });
+    y += headerHeight;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+
+    rows.forEach((row) => {
+      addPageIfNeeded(rowHeight + 4);
+      x = tableX;
+      pdf.setDrawColor(220, 226, 232);
+      pdf.rect(tableX, y, colWidths.reduce((a,b)=>a+b,0), rowHeight, "S");
+      row.forEach((cell, i) => {
+        const textLines = pdf.splitTextToSize(String(cell), colWidths[i] - 4);
+        pdf.text(textLines.slice(0, 2), x + 2, y + 5.6);
+        if (i > 0) pdf.line(x, y, x, y + rowHeight);
+        x += colWidths[i];
+      });
+      y += rowHeight;
+    });
+    y += 5;
+  }
+
+  pdf.setFillColor(7, 21, 47);
+  pdf.rect(0, 0, pageWidth, 28, "F");
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(20);
+  pdf.text("PCR Simulator Report", margin, 18);
+  pdf.setTextColor(23, 32, 51);
+  y = 38;
+
+  addText(`Student Name: ${studentName}`, margin, 11, "bold");
+  addText(`NSID: ${nsid}`, margin, 11, "bold");
+  addText(`Timestamp: ${timestamp}`, margin, 10);
+
+  y += 2;
+  pdf.setDrawColor(200, 210, 220);
+  pdf.line(margin, y, pageWidth - margin, y);
+  y += 8;
+
+  addText("Primers Used", margin, 14, "bold");
+  const primers = primerList();
+  primers.forEach(p => addText(`Primer ${p.id}: ${p.seq}`, margin, 10));
+
+  addText("PCR Products", margin, 14, "bold");
+  if (pcrProducts.length) {
+    const productRows = pcrProducts.map(p => [
+      p.individual,
+      p.forwardPrimer.replace("Primer ", "P"),
+      p.reversePrimer.replace("Primer ", "P"),
+      `${p.start.toLocaleString()}-${p.end.toLocaleString()}`,
+      `${p.size.toLocaleString()} bp`,
+      `${gcContent(p.amplicon)}%`
+    ]);
+    drawTable(
+      ["Sample", "Forward", "Reverse", "Position", "Size", "GC"],
+      productRows,
+      [32, 28, 28, 44, 28, 22]
+    );
+  } else {
+    addText("No PCR product found.", margin, 10);
+  }
+
+  addText("Gel Electrophoresis", margin, 14, "bold");
+  addText("The gel image below shows the checked or revealed expected PCR fragments. The fragment bank and drag targets are removed from the report for clarity.", margin, 9);
+
+  const gelSource = document.getElementById("gel");
+  const gelClone = gelSource.cloneNode(true);
+  gelClone.querySelectorAll(".dropBand").forEach(drop => drop.remove());
+  gelClone.style.width = "1100px";
+  gelClone.style.minHeight = "650px";
+  gelClone.style.borderRadius = "24px";
+  gelClone.style.margin = "0";
+
+  const gelWrapper = document.createElement("div");
+  gelWrapper.style.position = "absolute";
+  gelWrapper.style.left = "-9999px";
+  gelWrapper.style.top = "0";
+  gelWrapper.style.background = "white";
+  gelWrapper.style.padding = "24px";
+  gelWrapper.style.width = "1148px";
+  gelWrapper.appendChild(gelClone);
+  document.body.appendChild(gelWrapper);
+
+  try {
+    const canvas = await html2canvas(gelWrapper, {
+      scale: 3,
+      backgroundColor: "#ffffff",
+      useCORS: true
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+    const imgWidth = pageWidth - margin * 2;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    addPageIfNeeded(imgHeight + 8);
+    pdf.addImage(imgData, "PNG", margin, y, imgWidth, imgHeight);
+    y += imgHeight + 8;
+  } finally {
+    document.body.removeChild(gelWrapper);
+  }
+
+  addPageIfNeeded(28);
+  addText("Interpretation", margin, 14, "bold");
+  addText("Predicted PCR products were placed according to their expected fragment size. Smaller DNA fragments migrate farther down the gel.", margin, 10);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(100, 116, 139);
+  pdf.text("Dr. Andres Posso-Terranova. 2026. © · Genetics Virtual Lab", margin, pageHeight - 8);
+
+  const cleanName = studentName.replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "") || "student";
+  pdf.save(`${cleanName}_PCR_Simulator_Report.pdf`);
+  show("exportMsg", "PDF report generated successfully.", "good");
+}
+
+function show(id,msg,type=""){const el=document.getElementById(id);el.className=`notice ${type}`;el.innerHTML=msg;el.classList.remove("hide")}
+function loadExample(){}
+function clearAll(){
+templates=[];
+template="";
+templateName="Untitled sequence";
+pcrProducts=[];
+placedBands={};
+gelChecked=false;
+
+for(let i=1;i<=5;i++){
+const input=document.getElementById(`fileInput${i}`);
+if(input) input.value="";
+}
+
+[1,2,3].forEach(i=>document.getElementById(`primer${i}`).value="");
+
+document.getElementById("resultsTable").innerHTML="";
+document.getElementById("fragmentBank").innerHTML="";
+["sequencePreview","seqStats","primerMsg","gelMsg","exportMsg"].forEach(id=>document.getElementById(id).classList.add("hide"));
+
+document.getElementById("exportBtn").disabled=true;
+document.getElementById("resultSummary").className="notice warn";
+document.getElementById("resultSummary").innerHTML="Load samples and primers, then click <b>Perform PCR</b>.";
+
+renderGel();
+}
+renderGel();
+</script>
+</body>
+</html>
