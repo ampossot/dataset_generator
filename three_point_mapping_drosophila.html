@@ -380,6 +380,37 @@ textarea {
   box-shadow: 0 16px 32px rgba(0,0,0,0.28);
 }
 
+
+.optionalChiGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.optionalRatioGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 700px) {
+  .optionalChiGrid,
+  .optionalRatioGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.optionalCheckTable input{
+  font-size:16px;
+}
+
+.optionalLockedNote{
+  margin-top:10px;
+}
+
 </style>
 </head>
 
@@ -431,6 +462,7 @@ textarea {
 <div id="interferenceStep"></div>
 <div id="conclusionStep"></div>
 <div id="finalCredit"></div>
+<div id="pairChiSquareStep"></div>
 
 <script>
 let labLocked = false;
@@ -480,6 +512,7 @@ function clearAll() {
   document.getElementById("interferenceStep").innerHTML = "";
   document.getElementById("conclusionStep").innerHTML = "";
   document.getElementById("finalCredit").innerHTML = "";
+  document.getElementById("pairChiSquareStep").innerHTML = "";
 }
 
 function startMappingLab() {
@@ -1282,6 +1315,335 @@ function saveConclusion() {
       </a>
     </div>
   `;
+
+  showOptionalPairChiSquareIntro();
+}
+
+function showOptionalPairChiSquareIntro() {
+  document.getElementById("pairChiSquareStep").innerHTML = `
+    <div class="card">
+      <h2>Optional: Pair-based χ² test for independent assortment</h2>
+      <p>This optional final step lets you test whether a selected pair of traits fits an expected four-class ratio, such as <b>1 : 1 : 1 : 1</b>. It uses the same progeny counts entered for the three-point mapping exercise.</p>
+      <button id="open_pair_chi_button" onclick="showPairChiSquareForm()">Open Optional Pair-based χ² Test</button>
+      <div id="pair_chi_form"></div>
+    </div>
+  `;
+}
+
+function showPairChiSquareForm() {
+  document.getElementById("open_pair_chi_button").disabled = true;
+
+  document.getElementById("pair_chi_form").innerHTML = `
+    <div class="info">
+      <b>Student task:</b> Choose one trait pair. First enter the observed and expected numbers for the four phenotype classes. The χ² calculation will unlock only after those observed and expected values are correct.
+    </div>
+
+    <div class="optionalChiGrid">
+      <div>
+        <label>Trait pair</label>
+        <select id="pair_chi_trait_pair" onchange="resetOptionalPairChiSquare()">
+          <option value="0,1">Body color × Eye color</option>
+          <option value="0,2">Body color × Wing size</option>
+          <option value="1,2">Eye color × Wing size</option>
+        </select>
+      </div>
+      <div>
+        <label>Dataset</label>
+        <input value="Entered three-point mapping progeny data" disabled>
+      </div>
+    </div>
+
+    <div class="warning">
+      <b>Expected values:</b> Students should calculate the expected number for each class from the hypothesis they are testing. For example, a 1 : 1 : 1 : 1 expectation means each class should have total progeny ÷ 4.
+    </div>
+
+    <table class="optionalCheckTable">
+      <tr>
+        <th>Phenotype class</th>
+        <th>Observed count</th>
+        <th>Expected count</th>
+      </tr>
+      <tr>
+        <td id="pair_class_label_0">Wild type for both</td>
+        <td><input id="pair_observed_0" type="number" min="0" step="1" placeholder=""></td>
+        <td><input id="pair_expected_0" type="number" min="0" step="0.01" placeholder=""></td>
+      </tr>
+      <tr>
+        <td id="pair_class_label_1">Trait 1 mutant only</td>
+        <td><input id="pair_observed_1" type="number" min="0" step="1" placeholder=""></td>
+        <td><input id="pair_expected_1" type="number" min="0" step="0.01" placeholder=""></td>
+      </tr>
+      <tr>
+        <td id="pair_class_label_2">Trait 2 mutant only</td>
+        <td><input id="pair_observed_2" type="number" min="0" step="1" placeholder=""></td>
+        <td><input id="pair_expected_2" type="number" min="0" step="0.01" placeholder=""></td>
+      </tr>
+      <tr>
+        <td id="pair_class_label_3">Both mutant</td>
+        <td><input id="pair_observed_3" type="number" min="0" step="1" placeholder=""></td>
+        <td><input id="pair_expected_3" type="number" min="0" step="0.01" placeholder=""></td>
+      </tr>
+    </table>
+
+    <button id="check_pair_values_button" onclick="checkOptionalPairObservedExpected()">Check Observed and Expected Values</button>
+    <div id="pair_value_feedback"></div>
+
+    <button id="run_pair_chi_button" onclick="runOptionalPairChiSquare()" disabled>Calculate χ² and Show Explanation</button>
+    <div id="pair_chi_output"></div>
+  `;
+
+  updatePairChiLabels();
+}
+
+function resetOptionalPairChiSquare() {
+  updatePairChiLabels();
+  for (let i = 0; i < 4; i++) {
+    const obs = document.getElementById("pair_observed_" + i);
+    const exp = document.getElementById("pair_expected_" + i);
+    if (obs) {
+      obs.value = "";
+      obs.disabled = false;
+      obs.style.backgroundColor = "white";
+    }
+    if (exp) {
+      exp.value = "";
+      exp.disabled = false;
+      exp.style.backgroundColor = "white";
+    }
+  }
+
+  const checkButton = document.getElementById("check_pair_values_button");
+  const runButton = document.getElementById("run_pair_chi_button");
+  if (checkButton) checkButton.disabled = false;
+  if (runButton) runButton.disabled = true;
+
+  document.getElementById("pair_value_feedback").innerHTML = "";
+  document.getElementById("pair_chi_output").innerHTML = "";
+}
+
+function shortTraitName(index) {
+  return genes[index].mutant;
+}
+
+function updatePairChiLabels() {
+  const pairValue = document.getElementById("pair_chi_trait_pair").value;
+  const pair = pairValue.split(",").map(Number);
+  const a = shortTraitName(pair[0]);
+  const b = shortTraitName(pair[1]);
+  const labels = [
+    "wild type for both",
+    `${a} only`,
+    `${b} only`,
+    `${a} + ${b}`
+  ];
+
+  labels.forEach((label, i) => {
+    document.getElementById("pair_class_label_" + i).textContent = label;
+  });
+}
+
+function pairClassFromBits(bits, a, b) {
+  const ma = bits[a] === 1;
+  const mb = bits[b] === 1;
+
+  if (!ma && !mb) return 0;
+  if (ma && !mb) return 1;
+  if (!ma && mb) return 2;
+  return 3;
+}
+
+function getOptionalPairObserved() {
+  const pair = document.getElementById("pair_chi_trait_pair").value.split(",").map(Number);
+  const observed = [0,0,0,0];
+
+  enteredData.forEach(row => {
+    observed[pairClassFromBits(row.bits, pair[0], pair[1])] += row.total;
+  });
+
+  return observed;
+}
+
+function getOptionalPairExpectedFromData() {
+  const total = totalProgeny;
+  return [total / 4, total / 4, total / 4, total / 4];
+}
+
+function checkOptionalPairObservedExpected() {
+  const observedExpected = getOptionalPairObserved();
+  const expectedExpected = getOptionalPairExpectedFromData();
+  let allCorrect = true;
+  let observedWrong = [];
+  let expectedWrong = [];
+
+  for (let i = 0; i < 4; i++) {
+    const obsInput = document.getElementById("pair_observed_" + i);
+    const expInput = document.getElementById("pair_expected_" + i);
+    const obsValue = parseFloat(obsInput.value);
+    const expValue = parseFloat(expInput.value);
+
+    obsInput.style.backgroundColor = "white";
+    expInput.style.backgroundColor = "white";
+
+    if (Number.isNaN(obsValue) || Math.abs(obsValue - observedExpected[i]) > 0.001) {
+      obsInput.style.backgroundColor = "#ffd6d6";
+      observedWrong.push(i + 1);
+      allCorrect = false;
+    }
+
+    if (Number.isNaN(expValue) || Math.abs(expValue - expectedExpected[i]) > 0.05) {
+      expInput.style.backgroundColor = "#ffd6d6";
+      expectedWrong.push(i + 1);
+      allCorrect = false;
+    }
+  }
+
+  if (!allCorrect) {
+    let feedback = `<div class="danger"><b>Check your observed and expected values.</b>`;
+    if (observedWrong.length) {
+      feedback += `<br>Observed counts need attention in class(es): <b>${observedWrong.join(", ")}</b>. Recount the original progeny classes for the selected trait pair.`;
+    }
+    if (expectedWrong.length) {
+      feedback += `<br>Expected counts need attention in class(es): <b>${expectedWrong.join(", ")}</b>. For this optional independent-assortment test, use a <b>1 : 1 : 1 : 1</b> expectation, so each expected class is total progeny ÷ 4.`;
+    }
+    feedback += `</div>`;
+
+    document.getElementById("pair_value_feedback").innerHTML = feedback;
+    document.getElementById("run_pair_chi_button").disabled = true;
+    return;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    document.getElementById("pair_observed_" + i).disabled = true;
+    document.getElementById("pair_expected_" + i).disabled = true;
+  }
+
+  document.getElementById("pair_chi_trait_pair").disabled = true;
+  document.getElementById("check_pair_values_button").disabled = true;
+  document.getElementById("run_pair_chi_button").disabled = false;
+
+  document.getElementById("pair_value_feedback").innerHTML = `
+    <div class="success optionalLockedNote">
+      <b>Observed and expected values are correct and locked.</b> You can now calculate χ² and view the interpretation.
+    </div>
+  `;
+}
+
+function runOptionalPairChiSquare() {
+  const observed = [0,1,2,3].map(i => parseFloat(document.getElementById("pair_observed_" + i).value));
+  const expected = [0,1,2,3].map(i => parseFloat(document.getElementById("pair_expected_" + i).value));
+
+  if (observed.some(Number.isNaN) || expected.some(Number.isNaN)) {
+    alert("Please check observed and expected values first.");
+    return;
+  }
+
+  let chi = 0;
+  let df = 0;
+
+  for (let i = 0; i < 4; i++) {
+    if (expected[i] > 0) {
+      chi += Math.pow(observed[i] - expected[i], 2) / expected[i];
+      df++;
+    }
+  }
+
+  df = Math.max(1, df - 1);
+  const pValue = chiSquarePValue(chi, df);
+  const labels = [0,1,2,3].map(i => document.getElementById("pair_class_label_" + i).textContent);
+  const rejects = pValue < 0.05;
+
+  const rows = labels.map((label, i) => {
+    const contribution = expected[i] > 0 ? Math.pow(observed[i] - expected[i], 2) / expected[i] : 0;
+    return `
+      <tr>
+        <td>${label}</td>
+        <td>${observed[i]}</td>
+        <td>${expected[i].toFixed(2)}</td>
+        <td>${contribution.toFixed(3)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  document.getElementById("run_pair_chi_button").disabled = true;
+
+  document.getElementById("pair_chi_output").innerHTML = `
+    <div class="card">
+      <h3>Pair-based χ² results</h3>
+      <table>
+        <tr>
+          <th>Phenotype class</th>
+          <th>Observed</th>
+          <th>Expected</th>
+          <th>χ² contribution</th>
+        </tr>
+        ${rows}
+      </table>
+      <div class="${rejects ? "warning" : "success"}">
+        <b>χ² = ${chi.toFixed(3)}</b>; df = ${df}; p-value = ${pValue < 0.0001 ? "&lt; 0.0001" : pValue.toFixed(4)}.
+        <br>${rejects ? "Reject H₀ at α = 0.05. These data do not fit the expected 1 : 1 : 1 : 1 independent-assortment ratio for this pair." : "Do not reject H₀ at α = 0.05. These data do not provide strong evidence against the expected 1 : 1 : 1 : 1 ratio for this pair."}
+      </div>
+      <div class="info">
+        <b>Explanation:</b> This test collapses the eight three-point mapping phenotype classes into four classes for one selected pair of traits. The χ² statistic compares the observed counts entered by the student with the expected counts under the selected independent-assortment expectation.
+      </div>
+    </div>
+  `;
+}
+
+function gammaln(x) {
+  const cof = [76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];
+  let ser = 1.000000000190015;
+  let y = x;
+  let tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  for (let j = 0; j < 6; j++) ser += cof[j] / ++y;
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+
+function gammp(a, x) {
+  if (x < 0 || a <= 0) return NaN;
+  if (x === 0) return 0;
+  if (x < a + 1) {
+    let ap = a;
+    let del = 1 / a;
+    let sum = del;
+    for (let n = 1; n <= 100; n++) {
+      ap++;
+      del *= x / ap;
+      sum += del;
+      if (Math.abs(del) < Math.abs(sum) * 3e-7) {
+        return sum * Math.exp(-x + a * Math.log(x) - gammaln(a));
+      }
+    }
+  }
+  return 1 - gammq(a, x);
+}
+
+function gammq(a, x) {
+  if (x < 0 || a <= 0) return NaN;
+  if (x < a + 1) return 1 - gammp(a, x);
+  let b = x + 1 - a;
+  let c = 1 / 1e-30;
+  let d = 1 / b;
+  let h = d;
+
+  for (let i = 1; i <= 100; i++) {
+    let an = -i * (i - a);
+    b += 2;
+    d = an * d + b;
+    if (Math.abs(d) < 1e-30) d = 1e-30;
+    c = b + an / c;
+    if (Math.abs(c) < 1e-30) c = 1e-30;
+    d = 1 / d;
+    let del = d * c;
+    h *= del;
+    if (Math.abs(del - 1) < 3e-7) break;
+  }
+
+  return Math.exp(-x + a * Math.log(x) - gammaln(a)) * h;
+}
+
+function chiSquarePValue(x, df) {
+  return gammq(df / 2, x / 2);
 }
 
 function exportPDF() {
