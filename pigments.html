@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Drosophila Eye Pigment Pathway Simulator</title>
+<style>
+:root{
+  --bg:#07152f;
+  --card:#fffdf8;
+  --ink:#172033;
+  --muted:#64748b;
+  --line:#dbe3ef;
+  --teal:#14b8a6;
+  --cyan:#38bdf8;
+  --green:#22c55e;
+  --gold:#f59e0b;
+  --red:#ef4444;
+  --purple:#7c3aed;
+  --pink:#e11d48;
+  --brown:#92400e;
+  --shadow:0 18px 45px rgba(7,21,47,.18);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left,rgba(56,189,248,.24),transparent 32%),
+    radial-gradient(circle at 80% 10%,rgba(20,184,166,.25),transparent 28%),
+    linear-gradient(180deg,#07152f 0%,#0b1020 38%,#f5f7fb 38%,#f8fafc 100%);
+}
+.topbar{
+  max-width:1380px;
+  margin:0 auto;
+  padding:16px 20px 0;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.brand{color:white;display:flex;gap:12px;align-items:center;font-weight:950}
+.logo{
+  width:50px;height:50px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#69f0d0,#66c7ff);
+  color:#07152f;font-weight:1000;
+  box-shadow:0 10px 25px rgba(0,0,0,.22)
+}
+.backBtn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:11px 16px;border-radius:16px;text-decoration:none;
+  color:white;background:rgba(255,255,255,.11);
+  border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(8px);font-weight:900;
+  transition:.18s transform,.18s background
+}
+.backBtn:hover{transform:translateY(-2px);background:rgba(255,255,255,.18)}
+header{
+  color:white;
+  padding:34px 20px 26px;
+  text-align:center;
+  position:relative;
+  overflow:hidden
+}
+header:before{
+  content:"";
+  position:absolute;inset:0;opacity:.10;
+  background-image:
+    linear-gradient(90deg,transparent 0 48%,rgba(255,255,255,.55) 48% 52%,transparent 52%),
+    radial-gradient(circle,white 1px,transparent 1px);
+  background-size:120px 120px,24px 24px
+}
+header>*{position:relative}
+h1{margin:0;font-size:clamp(2rem,5vw,4rem);letter-spacing:.3px}
+header p{margin:10px auto 0;max-width:980px;font-size:1.05rem;opacity:.92;line-height:1.45}
+.wrap{max-width:1380px;margin:0 auto;padding:22px}
+.grid{
+  display:grid;
+  grid-template-columns:380px 1fr;
+  gap:18px;
+  align-items:start;
+}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}.sticky{position:static!important}}
+.card{
+  background:rgba(255,253,248,.96);
+  border:1px solid rgba(219,227,239,.9);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(5px)
+}
+.sticky{position:sticky;top:16px}
+h2{margin:0 0 12px;font-size:1.35rem}
+h3{margin:14px 0 8px;font-size:1rem}
+.small{font-size:.89rem;color:var(--muted);line-height:1.45}
+.section{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+label{display:block;margin:10px 0 5px;font-weight:850;font-size:.92rem}
+select,input{
+  width:100%;
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  padding:11px 12px;
+  font:inherit;
+  background:white;
+  color:var(--ink)
+}
+button{
+  border:0;border-radius:16px;padding:12px 16px;cursor:pointer;
+  font-weight:900;color:white;
+  background:linear-gradient(135deg,#0f766e,#14b8a6);
+  box-shadow:0 12px 24px rgba(20,184,166,.22);
+  transition:.15s transform,.15s filter,.15s box-shadow
+}
+button:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 16px 30px rgba(20,184,166,.28)}
+button.secondary{background:linear-gradient(135deg,#2563eb,#38bdf8)}
+button.gold{background:linear-gradient(135deg,#b45309,#f59e0b)}
+button.purple{background:linear-gradient(135deg,#6d28d9,#a855f7)}
+button.ghost{background:#eef2f7;color:#0f172a;box-shadow:none}
+.btnbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.notice{
+  margin-top:12px;padding:12px 14px;border-radius:16px;
+  background:#eff6ff;border-left:6px solid #38bdf8;
+  color:#0f172a;line-height:1.45
+}
+.notice.good{background:#ecfdf5;border-left-color:#22c55e}
+.notice.bad{background:#fef2f2;border-left-color:#ef4444}
+.notice.warn{background:#fffbeb;border-left-color:#f59e0b}
+.stepBadge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:950;
+  background:#dbeafe;color:#1e3a8a;margin-bottom:10px
+}
+.alleleGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.geneCard{
+  background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:12px
+}
+.geneCard strong{display:block;margin-bottom:4px}
+.geneHint{font-size:.78rem;color:#64748b;line-height:1.35}
+.mainGrid{
+  display:grid;
+  grid-template-columns:1.25fr .75fr;
+  gap:18px;
+  align-items:start
+}
+@media(max-width:1050px){.mainGrid{grid-template-columns:1fr}}
+.pathway{
+  background:
+    radial-gradient(circle at top left,rgba(20,184,166,.11),transparent 30%),
+    linear-gradient(135deg,#ffffff,#f8fbff);
+  border:1px solid #dbeafe;
+  border-radius:24px;
+  padding:18px;
+  overflow:hidden
+}
+.pathwaySvg{width:100%;height:auto;display:block}
+.node{filter:drop-shadow(0 7px 10px rgba(15,23,42,.12))}
+.nodeText{font-size:15px;font-weight:900;fill:#0f172a}
+.subText{font-size:11px;font-weight:750;fill:#475569}
+.geneText{font-size:12px;font-weight:900;fill:white}
+.arrow{stroke:#334155;stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrowhead)}
+.arrow.active{stroke:#16a34a}
+.arrow.blocked{stroke:#ef4444;stroke-dasharray:8 7}
+.blockMark{font-size:28px;font-weight:1000;fill:#ef4444}
+.pigmentPanel{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px
+}
+@media(max-width:650px){.pigmentPanel{grid-template-columns:1fr}}
+.pigmentBox{
+  border:1px solid #e2e8f0;border-radius:18px;padding:12px;background:white;
+}
+.pigmentTitle{font-weight:950;display:flex;align-items:center;gap:8px}
+.dot{width:18px;height:18px;border-radius:50%;display:inline-block;box-shadow:0 3px 8px rgba(0,0,0,.16)}
+.dot.pter{background:linear-gradient(135deg,#fbbf24,#e11d48)}
+.dot.ommo{background:linear-gradient(135deg,#92400e,#451a03)}
+.dot.none{background:#e2e8f0}
+.status{
+  margin-top:8px;
+  font-size:.86rem;
+  font-weight:850;
+  color:#334155
+}
+.eyeStage{
+  min-height:330px;
+  border-radius:24px;
+  background:
+    radial-gradient(circle at center,rgba(255,255,255,.22),transparent 24%),
+    linear-gradient(180deg,#111827,#020617);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.eyeStage:after{
+  content:"";
+  position:absolute;
+  inset:14px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.14);
+  pointer-events:none;
+}
+.flyHead{
+  width:280px;height:230px;position:relative
+}
+.eye{
+  position:absolute;top:58px;width:108px;height:130px;border-radius:58% 45% 55% 45%;
+  background:#b91c1c;
+  border:4px solid rgba(255,255,255,.18);
+  box-shadow:inset 0 8px 22px rgba(255,255,255,.18), inset 0 -18px 28px rgba(0,0,0,.28), 0 0 30px rgba(255,0,0,.25);
+  overflow:hidden
+}
+.eye.left{left:24px;transform:rotate(-12deg)}
+.eye.right{right:24px;transform:scaleX(-1) rotate(-12deg)}
+.eye:before{
+  content:"";
+  position:absolute;inset:8px;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 18px 20px,rgba(255,255,255,.7) 0 5px,transparent 6px),
+    repeating-linear-gradient(35deg,rgba(255,255,255,.22) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(-35deg,rgba(0,0,0,.16) 0 2px,transparent 2px 9px);
+  opacity:.75
+}
+.flyFace{
+  position:absolute;left:92px;top:85px;width:96px;height:110px;border-radius:45% 45% 55% 55%;
+  background:linear-gradient(180deg,#8b5e34,#4a2d18);
+  box-shadow:inset 0 6px 18px rgba(255,255,255,.16),0 8px 20px rgba(0,0,0,.3)
+}
+.antenna{
+  position:absolute;top:38px;width:72px;height:48px;border-top:4px solid #6b3f21;border-radius:50%
+}
+.antenna.a{left:80px;transform:rotate(-25deg)}
+.antenna.b{right:80px;transform:rotate(25deg)}
+.eyeLabel{
+  position:absolute;bottom:18px;left:18px;right:18px;text-align:center;
+  color:white;font-weight:1000;text-shadow:0 2px 8px rgba(0,0,0,.9);
+  letter-spacing:.3px
+}
+.tlcPlate{
+  background:#f8fafc;
+  border:2px solid #cbd5e1;
+  border-radius:18px;
+  height:460px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 8px rgba(255,255,255,.65)
+}
+.tlcPlate:before{
+  content:"UV TLC plate";
+  position:absolute;top:10px;right:14px;
+  color:#64748b;font-weight:900;font-size:.8rem;
+}
+.solventFront{
+  position:absolute;left:34px;right:34px;top:55px;border-top:2px dashed #94a3b8
+}
+.origin{
+  position:absolute;left:34px;right:34px;bottom:54px;border-top:2px solid #64748b
+}
+.laneNames{
+  position:absolute;left:30px;right:30px;bottom:16px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;
+  font-weight:950;font-size:.78rem;color:#334155
+}
+.tlcLanes{
+  position:absolute;left:30px;right:30px;top:70px;bottom:76px;
+  display:grid;grid-template-columns:repeat(5,1fr);gap:6px
+}
+.tlcLane{position:relative;border-left:1px dashed #e2e8f0;border-right:1px dashed #e2e8f0}
+.spot{
+  position:absolute;left:50%;transform:translate(-50%,50%);
+  width:34px;height:14px;border-radius:999px;
+  box-shadow:0 0 12px currentColor,0 0 28px currentColor;
+  opacity:.92;
+  border:1px solid rgba(255,255,255,.75)
+}
+.spot.smallSpot{width:26px;height:11px;opacity:.82}
+.spot.iso{color:#eab308;background:#facc15;bottom:75%}
+.spot.sep{color:#fef08a;background:#fef08a;bottom:65%}
+.spot.bio{color:#60a5fa;background:#60a5fa;bottom:54%}
+.spot.amino{color:#2563eb;background:#2563eb;bottom:44%}
+.spot.xan{color:#2dd4bf;background:#2dd4bf;bottom:34%}
+.spot.isoxan{color:#8b5cf6;background:#8b5cf6;bottom:23%}
+.spot.droso{color:#fb923c;background:#fb923c;bottom:12%}
+.legendList{display:grid;gap:7px;margin-top:10px}
+.legendItem{display:flex;align-items:center;gap:8px;font-size:.84rem;color:#334155}
+.legendColor{width:16px;height:10px;border-radius:99px;box-shadow:0 0 8px currentColor}
+
+.legendColor.iso{background:#facc15;color:#eab308}
+.legendColor.sep{background:#fef08a;color:#fef08a}
+.legendColor.bio{background:#60a5fa;color:#60a5fa}
+.legendColor.amino{background:#2563eb;color:#2563eb}
+.legendColor.xan{background:#2dd4bf;color:#2dd4bf}
+.legendColor.isoxan{background:#8b5cf6;color:#8b5cf6}
+.legendColor.droso{background:#fb923c;color:#fb923c}
+
+table{width:100%;border-collapse:collapse;background:white;border-radius:18px;overflow:hidden;border:1px solid #e2e8f0}
+th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top;font-size:.9rem}
+th{background:#eaf7f6;color:#0f3f46;font-weight:950}
+tr:last-child td{border-bottom:0}
+.quizBox{
+  background:linear-gradient(135deg,#fefce8,#eff6ff);
+  border:1px solid #fde68a;
+  border-radius:22px;
+  padding:16px
+}
+.detectiveBox{
+  background:linear-gradient(135deg,#f0fdfa,#f5f3ff);
+  border:1px solid #99f6e4;
+  border-radius:22px;
+  padding:16px
+}
+.detectiveGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:12px
+}
+@media(max-width:850px){.detectiveGrid{grid-template-columns:1fr}}
+.detectiveQuestion{
+  background:white;
+  border:1px solid #dbeafe;
+  border-radius:18px;
+  padding:12px;
+}
+.detectiveQuestion label{
+  margin-top:0;
+}
+.epistasisBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#ede9fe;
+  color:#4c1d95;
+  font-weight:950;
+  margin-top:10px;
+}
+
+.answerGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+@media(max-width:600px){.answerGrid{grid-template-columns:1fr}}
+.choice{
+  background:white;color:#172033;box-shadow:0 7px 14px rgba(15,23,42,.08);
+  border:1px solid #e2e8f0
+}
+.choice.correct{background:linear-gradient(135deg,#16a34a,#22c55e);color:white}
+.choice.wrong{background:linear-gradient(135deg,#b91c1c,#ef4444);color:white}
+.footer{text-align:center;color:#64748b;padding:26px;font-size:.9rem}
+.breath{animation:breath 2.4s ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+
+.coffee{
+  text-align:center;
+  margin-top:15px;
+}
+
+.coffee img{
+  max-width:230px;
+  width:90%;
+  border-radius:18px;
+  transition:transform .22s ease, filter .22s ease, box-shadow .22s ease;
+}
+
+.coffee img:hover{
+  transform:translateY(-5px) scale(1.06) rotate(-1.2deg);
+  filter:brightness(1.05) saturate(1.12);
+  box-shadow:0 16px 32px rgba(0,0,0,.28);
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><div class="logo">AP</div><div>Genetics Virtual Lab<br><span style="font-size:.78rem;opacity:.78">Eye Pigment Pathway Simulator</span></div></div>
+  <a class="backBtn" href="virtual_lab.html">← Back to Genetics Virtual Lab</a>
+</div>
+
+<header>
+  <h1>👁️ <i>Drosophila</i> Eye Pigment Pathway Simulator</h1>
+  <p>Mutate genes, block pathways, predict pigment composition, compare TLC patterns, and infer eye color. Built for Lab 5: pteridines, ommochromes, and epistasis.</p>
+</header>
+
+<div class="wrap grid">
+  <aside class="card sticky">
+    <span class="stepBadge">1 · Build genotype</span>
+    <h2>Choose a genotype</h2>
+    <p class="small">Toggle the genes that affect pigment transport or pigment synthesis. The simulator updates the metabolic pathways, TLC plate, and eye phenotype instantly.</p>
+
+    <label>Sex</label>
+    <select id="sex" onchange="updateAll()">
+      <option value="female">Female</option>
+      <option value="male">Male</option>
+    </select>
+
+    <div class="section">
+      <div class="alleleGrid">
+        <div class="geneCard">
+          <strong>white gene · X-linked</strong>
+          <select id="wgeno" onchange="updateAll()"></select>
+          <div class="geneHint">Transporter subunit needed for both pteridine and ommochrome precursors.</div>
+        </div>
+        <div class="geneCard">
+          <strong>brown gene · autosomal</strong>
+          <select id="bwgeno" onchange="updateAll()">
+            <option value="+/+">bw+/bw+</option>
+            <option value="+/bw">bw+/bw</option>
+            <option value="bw/bw">bw/bw</option>
+          </select>
+          <div class="geneHint">Required for GTP precursor import into the pteridine pathway.</div>
+        </div>
+        <div class="geneCard">
+          <strong>scarlet gene · autosomal</strong>
+          <select id="stgeno" onchange="updateAll()">
+            <option value="+/+">st+/st+</option>
+            <option value="+/st">st+/st</option>
+            <option value="st/st">st/st</option>
+          </select>
+          <div class="geneHint">Required for tryptophan precursor import into the ommochrome pathway.</div>
+        </div>
+        <div class="geneCard">
+          <strong>sepia gene · autosomal</strong>
+          <select id="segeno" onchange="updateAll()">
+            <option value="+/+">se+/se+</option>
+            <option value="+/se">se+/se</option>
+            <option value="se/se">se/se</option>
+          </select>
+          <div class="geneHint">Blocks drosopterin synthesis in the pteridine pathway.</div>
+        </div>
+      </div>
+
+      <div class="btnbar">
+        <button class="secondary" onclick="preset('wild')">Wild type</button>
+        <button class="ghost" onclick="preset('white')">White</button>
+        <button class="ghost" onclick="preset('brown')">Brown</button>
+        <button class="ghost" onclick="preset('scarlet')">Scarlet</button>
+        <button class="ghost" onclick="preset('sepia')">Sepia</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="stepBadge">2 · Challenge mode</span>
+      <h2>Unknown fly</h2>
+      <p class="small">Generate an unknown genotype. Students predict the phenotype first, then reveal the pathway explanation.</p>
+      <div class="btnbar">
+        <button class="purple" onclick="newChallenge()">Generate unknown</button>
+        <button class="gold" onclick="revealChallenge()">Reveal answer</button>
+      </div>
+      <div id="challengeText" class="notice warn">Click <b>Generate unknown</b> to start.</div>
+    </div>
+  </aside>
+
+  <main>
+    <div class="mainGrid">
+      <section class="card">
+        <span class="stepBadge">Pathway logic</span>
+        <h2>Metabolic pathway status</h2>
+        <div class="pathway">
+          <svg class="pathwaySvg" viewBox="0 0 960 520" aria-label="Drosophila eye pigment pathway">
+            <defs>
+              <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="#334155"></path>
+              </marker>
+              <linearGradient id="pterGrad" x1="0" x2="1">
+                <stop offset="0%" stop-color="#facc15"/>
+                <stop offset="100%" stop-color="#e11d48"/>
+              </linearGradient>
+              <linearGradient id="ommoGrad" x1="0" x2="1">
+                <stop offset="0%" stop-color="#92400e"/>
+                <stop offset="100%" stop-color="#451a03"/>
+              </linearGradient>
+            </defs>
+
+            <rect x="30" y="40" width="165" height="64" rx="18" fill="#e0f2fe" class="node"/>
+            <text x="112" y="69" text-anchor="middle" class="nodeText">GTP</text>
+            <text x="112" y="89" text-anchor="middle" class="subText">pteridine precursor</text>
+
+            <rect x="30" y="330" width="165" height="64" rx="18" fill="#dcfce7" class="node"/>
+            <text x="112" y="359" text-anchor="middle" class="nodeText">Tryptophan</text>
+            <text x="112" y="379" text-anchor="middle" class="subText">ommochrome precursor</text>
+
+            <rect x="260" y="168" width="150" height="72" rx="20" fill="#fef3c7" class="node"/>
+            <text x="335" y="198" text-anchor="middle" class="nodeText">Eye transport</text>
+            <text x="335" y="220" text-anchor="middle" class="subText">white common subunit</text>
+
+            <rect x="260" y="50" width="150" height="56" rx="18" fill="#f59e0b" class="node"/>
+            <text x="335" y="84" text-anchor="middle" class="geneText" id="bwGeneText">brown active</text>
+
+            <rect x="260" y="338" width="150" height="56" rx="18" fill="#e11d48" class="node"/>
+            <text x="335" y="372" text-anchor="middle" class="geneText" id="stGeneText">scarlet active</text>
+
+            <rect x="505" y="55" width="180" height="150" rx="24" fill="#fff7ed" stroke="#fed7aa" stroke-width="3" class="node"/>
+            <text x="595" y="90" text-anchor="middle" class="nodeText">Pteridine pathway</text>
+            <text x="595" y="116" text-anchor="middle" class="subText">yellow, blue, green-blue,</text>
+            <text x="595" y="136" text-anchor="middle" class="subText">violet-blue, orange pigments</text>
+            <rect x="532" y="155" width="126" height="36" rx="12" fill="#8b5cf6"/>
+            <text x="595" y="179" text-anchor="middle" class="geneText" id="seGeneText">sepia active</text>
+
+            <rect x="505" y="310" width="180" height="96" rx="24" fill="#fef2f2" stroke="#fecaca" stroke-width="3" class="node"/>
+            <text x="595" y="346" text-anchor="middle" class="nodeText">Ommochrome pathway</text>
+            <text x="595" y="374" text-anchor="middle" class="subText">brown pigment</text>
+
+            <rect x="770" y="150" width="150" height="160" rx="28" fill="#f8fafc" stroke="#cbd5e1" stroke-width="3" class="node"/>
+            <text x="845" y="184" text-anchor="middle" class="nodeText">Eye color</text>
+            <text x="845" y="210" text-anchor="middle" class="subText" id="finalPigmentText">both pigments</text>
+            <circle cx="845" cy="260" r="34" id="miniEye" fill="#b91c1c" stroke="#334155" stroke-width="5"/>
+
+            <path id="a_bw" d="M195 72 C230 72 235 78 260 78" class="arrow active"/>
+            <path id="a_bw_transport" d="M335 106 C335 132 335 145 335 168" class="arrow active"/>
+            <path id="a_st" d="M195 362 C230 362 235 366 260 366" class="arrow active"/>
+            <path id="a_st_transport" d="M335 338 C335 296 335 265 335 240" class="arrow active"/>
+            <path id="a_transport_pter" d="M410 190 C455 150 455 118 505 115" class="arrow active"/>
+            <path id="a_transport_ommo" d="M410 220 C455 260 455 330 505 352" class="arrow active"/>
+            <path id="a_pter_eye" d="M685 130 C730 135 735 190 770 210" class="arrow active"/>
+            <path id="a_ommo_eye" d="M685 360 C735 352 735 292 770 265" class="arrow active"/>
+
+            <text id="x_w" x="420" y="212" class="blockMark" style="display:none">✕</text>
+            <text id="x_bw" x="232" y="63" class="blockMark" style="display:none">✕</text>
+            <text id="x_st" x="232" y="352" class="blockMark" style="display:none">✕</text>
+            <text id="x_se" x="668" y="180" class="blockMark" style="display:none">✕</text>
+          </svg>
+        </div>
+        <div id="explanation" class="notice good"></div>
+      </section>
+
+      <section class="card">
+        <span class="stepBadge">Phenotype</span>
+        <h2>Predicted fly eye color</h2>
+        <div class="eyeStage">
+          <div class="flyHead breath">
+            <div class="antenna a"></div>
+            <div class="antenna b"></div>
+            <div class="eye left" id="eyeLeft"></div>
+            <div class="eye right" id="eyeRight"></div>
+            <div class="flyFace"></div>
+          </div>
+          <div class="eyeLabel" id="phenotypeLabel">Wild type brick-red eyes</div>
+        </div>
+
+        <div class="section">
+          <h3>Present pigments</h3>
+          <div class="pigmentPanel">
+            <div class="pigmentBox">
+              <div class="pigmentTitle"><span class="dot pter"></span>Pteridines</div>
+              <div id="pterStatus" class="status"></div>
+            </div>
+            <div class="pigmentBox">
+              <div class="pigmentTitle"><span class="dot ommo"></span>Ommochrome</div>
+              <div id="ommoStatus" class="status"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px">
+      <span class="stepBadge">Chromatography</span>
+      <h2>Virtual TLC plate: pteridine pigments under UV light</h2>
+      <p class="small">Only pteridine pigments fluoresce on this virtual TLC plate. Ommochrome pigment contributes to eye color but is not shown as a fluorescent TLC band here.</p>
+      <div class="mainGrid">
+        <div>
+          <div class="tlcPlate">
+            <div class="solventFront"></div>
+            <div class="origin"></div>
+            <div class="tlcLanes" id="tlcLanes"></div>
+            <div class="laneNames"><div>+</div><div>bw</div><div>st</div><div>se</div><div>Current</div></div>
+          </div>
+        </div>
+        <div>
+          <h3>Band legend</h3>
+          <div class="legendList">
+            <div class="legendItem"><span class="legendColor iso"></span>Isosepiapterin · yellow</div>
+            <div class="legendItem"><span class="legendColor sep"></span>Sepiapterin · yellow</div>
+            <div class="legendItem"><span class="legendColor bio"></span>Biopterin · blue</div>
+            <div class="legendItem"><span class="legendColor amino"></span>2-amino-4-hydroxypteridine · blue</div>
+            <div class="legendItem"><span class="legendColor xan"></span>Xanthopterin · green-blue</div>
+            <div class="legendItem"><span class="legendColor isoxan"></span>Isoxanthopterin · violet-blue</div>
+            <div class="legendItem"><span class="legendColor droso"></span>Drosopterin · orange</div>
+          </div>
+          <div id="tlcInterpretation" class="notice"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+
+<div class="footer">Dr. Andres Posso-Terranova. 2026. © · Genetics Virtual Lab</div>
+
+<div class="coffee">
+  <a href="https://www.buymeacoffee.com/ampossot" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ampossot&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
+  </a>
+</div>
+
+
+<script>
+const pigmentBands=["iso","sep","bio","amino","xan","isoxan","droso"];
+
+
+function updateWhiteOptions(){
+  const sex=document.getElementById("sex").value;
+  const w=document.getElementById("wgeno");
+  const current=w.value;
+  if(sex==="male"){
+    w.innerHTML='<option value="+/Y">Xw+/Y</option><option value="w/Y">Xw/Y</option>';
+    if(current==="w/Y") w.value="w/Y";
+  }else{
+    w.innerHTML='<option value="+/+">Xw+/Xw+</option><option value="+/w">Xw+/Xw</option><option value="w/w">Xw/Xw</option>';
+    if(current==="+/w" || current==="w/w") w.value=current;
+  }
+}
+
+function isWhiteFunctional(){
+  const sex=document.getElementById("sex").value;
+  const w=document.getElementById("wgeno").value;
+  if(sex==="male") return w==="+/Y";
+  return w==="+/+" || w==="+/w";
+}
+function isGeneFunctional(id,mutant){
+  const v=document.getElementById(id).value;
+  return v!==`${mutant}/${mutant}`;
+}
+function state(){
+  const wOK=isWhiteFunctional();
+  const bwOK=isGeneFunctional("bwgeno","bw");
+  const stOK=isGeneFunctional("stgeno","st");
+  const seOK=isGeneFunctional("segeno","se");
+  const pterTransport=wOK && bwOK;
+  const ommoTransport=wOK && stOK;
+  const drosopterin=pterTransport && seOK;
+  const pteridines=pterTransport;
+  const ommo=ommoTransport;
+
+  let phenotype="white";
+  if(pteridines && ommo && seOK) phenotype="wild type";
+  else if(pteridines && ommo && !seOK) phenotype="sepia";
+  else if(!pteridines && ommo) phenotype="brown";
+  else if(pteridines && !ommo) phenotype="scarlet";
+  else phenotype="white";
+
+  return {wOK,bwOK,stOK,seOK,pterTransport,ommoTransport,drosopterin,pteridines,ommo,phenotype};
+}
+function setArrow(id,active){
+  const el=document.getElementById(id);
+  el.classList.remove("active","blocked");
+  el.classList.add(active?"active":"blocked");
+}
+function updatePathway(s){
+  setArrow("a_bw",s.bwOK);
+  setArrow("a_bw_transport",s.bwOK && s.wOK);
+  setArrow("a_st",s.stOK);
+  setArrow("a_st_transport",s.stOK && s.wOK);
+  setArrow("a_transport_pter",s.pterTransport);
+  setArrow("a_transport_ommo",s.ommoTransport);
+  setArrow("a_pter_eye",s.pteridines);
+  setArrow("a_ommo_eye",s.ommo);
+
+  document.getElementById("x_w").style.display=s.wOK?"none":"block";
+  document.getElementById("x_bw").style.display=s.bwOK?"none":"block";
+  document.getElementById("x_st").style.display=s.stOK?"none":"block";
+  document.getElementById("x_se").style.display=s.seOK?"none":"block";
+
+  document.getElementById("bwGeneText").textContent=s.bwOK?"brown active":"brown blocked";
+  document.getElementById("stGeneText").textContent=s.stOK?"scarlet active":"scarlet blocked";
+  document.getElementById("seGeneText").textContent=s.seOK?"sepia active":"sepia blocked";
+
+  const mini=document.getElementById("miniEye");
+  mini.setAttribute("fill", eyeColor(s.phenotype));
+  document.getElementById("finalPigmentText").textContent=summaryPigments(s);
+}
+function eyeColor(p){
+  if(p==="wild type") return "#b91c1c";
+  if(p==="scarlet") return "#ef4444";
+  if(p==="brown") return "#78350f";
+  if(p==="sepia") return "#5b3418";
+  return "#f8fafc";
+}
+function phenotypeTitle(p){
+  if(p==="wild type") return "Wild type brick-red eyes";
+  if(p==="scarlet") return "Scarlet bright-red eyes";
+  if(p==="brown") return "Brown eyes";
+  if(p==="sepia") return "Sepia dark-brown eyes";
+  return "White eyes";
+}
+function summaryPigments(s){
+  if(s.pteridines && s.ommo) return s.seOK ? "pteridines + ommochrome" : "ommochrome + altered pteridines";
+  if(s.pteridines && !s.ommo) return "pteridines only";
+  if(!s.pteridines && s.ommo) return "ommochrome only";
+  return "no visible pigments";
+}
+function updateEye(s){
+  const c=eyeColor(s.phenotype);
+  ["eyeLeft","eyeRight"].forEach(id=>{
+    const e=document.getElementById(id);
+    e.style.background=c;
+    if(s.phenotype==="white"){
+      e.style.boxShadow="inset 0 8px 22px rgba(255,255,255,.8), inset 0 -18px 28px rgba(0,0,0,.12), 0 0 30px rgba(255,255,255,.25)";
+      e.style.borderColor="rgba(30,41,59,.45)";
+    }else{
+      e.style.boxShadow="inset 0 8px 22px rgba(255,255,255,.18), inset 0 -18px 28px rgba(0,0,0,.28), 0 0 30px rgba(255,0,0,.25)";
+      e.style.borderColor="rgba(255,255,255,.18)";
+    }
+  });
+  document.getElementById("phenotypeLabel").textContent=phenotypeTitle(s.phenotype);
+  document.getElementById("pterStatus").innerHTML=s.pteridines
+    ? (s.seOK ? "Present: pteridine pigments, including drosopterin." : "Present but altered: drosopterin is absent because sepia is mutant.")
+    : "Absent: pteridine precursor is not transported.";
+  document.getElementById("ommoStatus").textContent=s.ommo
+    ? "Present: ommochrome pigment is synthesized."
+    : "Absent: tryptophan precursor is not transported.";
+}
+function explanationText(s){
+  let bits=[];
+  if(!s.wOK) bits.push("<b>white is mutant</b>, so both precursor transport systems fail. This is epistatic over the other pigment genes.");
+  else bits.push("<b>white is functional</b>, so precursor transport can occur if brown and scarlet are functional.");
+  if(!s.bwOK) bits.push("<b>brown is mutant</b>, so the GTP precursor for pteridines is not imported.");
+  if(!s.stOK) bits.push("<b>scarlet is mutant</b>, so the tryptophan precursor for ommochrome is not imported.");
+  if(!s.seOK && s.pteridines) bits.push("<b>sepia is mutant</b>, so drosopterin is missing from the pteridine profile.");
+  bits.push(`Final prediction: <b>${phenotypeTitle(s.phenotype)}</b>.`);
+  return bits.join(" ");
+}
+function drawTLC(s){
+  const lanes=document.getElementById("tlcLanes");
+  lanes.innerHTML="";
+  const presets=[
+    {label:"+", bands:pigmentBands},
+    {label:"bw", bands:[]},
+    {label:"st", bands:pigmentBands},
+    {label:"se", bands:pigmentBands.filter(x=>x!=="droso")},
+    {label:"current", bands:currentBands(s)}
+  ];
+  presets.forEach(p=>{
+    const lane=document.createElement("div");
+    lane.className="tlcLane";
+    p.bands.forEach((b,idx)=>{
+      const spot=document.createElement("div");
+      spot.className=`spot ${b} ${idx%2?'smallSpot':''}`;
+      lane.appendChild(spot);
+    });
+    lanes.appendChild(lane);
+  });
+  document.getElementById("tlcInterpretation").innerHTML = tlcText(s);
+}
+function currentBands(s){
+  if(!s.pteridines) return [];
+  if(!s.seOK) return pigmentBands.filter(x=>x!=="droso");
+  return pigmentBands;
+}
+function tlcText(s){
+  if(!s.pteridines) return "<b>Current sample:</b> no fluorescent pteridine bands are expected on TLC.";
+  if(!s.seOK) return "<b>Current sample:</b> pteridines are present, but the drosopterin band is absent.";
+  return "<b>Current sample:</b> the full pteridine band pattern is expected.";
+}
+function updateTableSummary(s){
+  document.getElementById("explanation").innerHTML=explanationText(s);
+}
+function updateAll(){
+  updateWhiteOptions();
+  const s=state();
+  updatePathway(s);
+  updateEye(s);
+  drawTLC(s);
+  updateTableSummary(s);
+}
+function preset(type){
+  document.getElementById("sex").value = type==="white" ? "male" : "female";
+  updateWhiteOptions();
+  if(type==="wild"){
+    document.getElementById("wgeno").value="+/+";
+    document.getElementById("bwgeno").value="+/+";
+    document.getElementById("stgeno").value="+/+";
+    document.getElementById("segeno").value="+/+";
+  }
+  if(type==="white"){
+    document.getElementById("wgeno").value="w/Y";
+    document.getElementById("bwgeno").value="+/+";
+    document.getElementById("stgeno").value="+/+";
+    document.getElementById("segeno").value="+/+";
+  }
+  if(type==="brown"){
+    document.getElementById("wgeno").value="+/+";
+    document.getElementById("bwgeno").value="bw/bw";
+    document.getElementById("stgeno").value="+/+";
+    document.getElementById("segeno").value="+/+";
+  }
+  if(type==="scarlet"){
+    document.getElementById("wgeno").value="+/+";
+    document.getElementById("bwgeno").value="+/+";
+    document.getElementById("stgeno").value="st/st";
+    document.getElementById("segeno").value="+/+";
+  }
+  if(type==="sepia"){
+    document.getElementById("wgeno").value="+/+";
+    document.getElementById("bwgeno").value="+/+";
+    document.getElementById("stgeno").value="+/+";
+    document.getElementById("segeno").value="se/se";
+  }
+  updateAll();
+}
+function genotypeString(){
+  return [
+    document.getElementById("sex").value==="male" ? document.getElementById("wgeno").selectedOptions[0].text : document.getElementById("wgeno").selectedOptions[0].text,
+    document.getElementById("bwgeno").selectedOptions[0].text,
+    document.getElementById("stgeno").selectedOptions[0].text,
+    document.getElementById("segeno").selectedOptions[0].text
+  ].join("; ");
+}
+function newChallenge(){
+  const sexes=["female","male"];
+  document.getElementById("sex").value=sexes[Math.floor(Math.random()*sexes.length)];
+  updateWhiteOptions();
+  const wopts=[...document.getElementById("wgeno").options];
+  document.getElementById("wgeno").value=wopts[Math.floor(Math.random()*wopts.length)].value;
+  ["bwgeno","stgeno","segeno"].forEach(id=>{
+    const opts=[...document.getElementById(id).options];
+    document.getElementById(id).value=opts[Math.floor(Math.random()*opts.length)].value;
+  });
+  updateAll();
+  document.getElementById("challengeText").className="notice warn";
+  document.getElementById("challengeText").innerHTML=`<b>Unknown fly generated.</b><br>Genotype: ${genotypeString()}<br><br>Predict the phenotype before revealing the answer.`;
+}
+function revealChallenge(){
+  const s=state();
+  document.getElementById("challengeText").className="notice good";
+  document.getElementById("challengeText").innerHTML=`<b>Answer:</b> ${phenotypeTitle(s.phenotype)}<br>${explanationText(s)}`;
+}
+updateWhiteOptions();
+updateAll();
+</script>
+</body>
+</html>
