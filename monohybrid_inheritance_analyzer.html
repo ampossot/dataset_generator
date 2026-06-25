@@ -365,13 +365,21 @@ textarea {
 /* Workflow guide additions */
 .workflowGuidePanel {
   display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 950px;
+  max-height: 90vh;
+  overflow-y: auto;
   background: white;
   padding: 20px;
-  margin-top: 15px;
   border-radius: 18px;
   text-align: center;
-  box-shadow: 0 10px 24px rgba(15,23,42,0.08);
+  box-shadow: 0 20px 50px rgba(15,23,42,0.35);
   border: 1px solid rgba(148,163,184,0.25);
+  z-index: 2000;
 }
 
 .workflowGuidePanel h2 {
@@ -391,14 +399,6 @@ textarea {
   border-radius: 14px;
   border: 1px solid #d1d5db;
   box-shadow: 0 12px 28px rgba(15,23,42,0.12);
-}
-
-.workflowButton {
-  background: linear-gradient(135deg, #7c3aed, #2f6fed);
-}
-
-.workflowButton:hover {
-  background: linear-gradient(135deg, #6d28d9, #1f5ad1);
 }
 
 .workflowCloseButton {
@@ -443,6 +443,7 @@ textarea {
 
   .workflowGuidePanel {
     padding: 12px;
+    width: 94%;
   }
 }
 
@@ -1259,12 +1260,9 @@ function toggleWorkflow(forceOpen) {
     return;
   }
 
-  let shouldOpen = forceOpen === true || (forceOpen !== false && panel.style.display === "none");
+  let isOpen = panel.style.display === "block";
+  let shouldOpen = forceOpen === true || (forceOpen !== false && !isOpen);
   panel.style.display = shouldOpen ? "block" : "none";
-
-  if (shouldOpen) {
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 }
 
 function exitApp() {
