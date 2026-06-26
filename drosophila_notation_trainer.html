@@ -4,6 +4,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Drosophila Notation Trainer</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -33,7 +36,7 @@ h1 {
 }
 
 .heroBanner::before {
-  content: "w/+  |  w/Y  |  +/+";
+  content: "w/+  |  Xw/Y  |  +/+";
   position: absolute;
   top: 14px;
   right: 22px;
@@ -176,6 +179,8 @@ button:disabled {
 .orangeButton:hover { background: #d97706; }
 .purpleButton { background: #7c3aed; }
 .purpleButton:hover { background: #6d28d9; }
+.exportButton { background: #198754; }
+.exportButton:hover { background: #157347; }
 
 .generateButton {
   font-size: 21px;
@@ -353,6 +358,18 @@ td, th {
 
 .smallText { font-size: 14px; color: #475569; }
 
+.sexLinkedTag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1e3a8a;
+  font-weight: 800;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+
 
 body::before {
   content: "";
@@ -376,7 +393,7 @@ body {
 }
 
 .heroBanner::before {
-  content: "w+/w  |  se+/se  |  Cy+/Cy";
+  content: "Xw+/Xw  |  Xw+/Y  |  se/se  |  Cy+/Cy";
 }
 
 .heroTitle em,
@@ -770,7 +787,8 @@ button {
   </p>
   <div class="heroBadges">
     <span class="heroBadge">Slash Notation</span>
-    <span class="heroBadge">X-linked Genes</span>
+    <span class="heroBadge">Sex-linked Genes</span>
+    <span class="heroBadge">Male vs Female Genotypes</span>
     <span class="heroBadge">Dominant Mutations</span>
     <span class="heroBadge">Phenotype Prediction</span>
   </div>
@@ -788,9 +806,9 @@ button {
       <p>This tool helps students practice the symbols used in fly genetics: gene-specific wild-type alleles such as <b>w+</b> and <b>se+</b>, the slash <b>/</b>, lowercase recessive mutations, uppercase dominant mutations, allele names, and slash notation.</p>
     </div>
     <div class="quickFormula" aria-hidden="true">
-      <span>w+/w</span>
+      <span>Xw+/Xw ♀</span>
+      <span>Xw+/Y ♂</span>
       <span>se+/se</span>
-      <span>Cy+/Cy</span>
     </div>
   </div>
 
@@ -803,7 +821,7 @@ button {
         <span class="stepIcon">📘</span>
         <span class="stepText">
           <strong>Learn the notation</strong>
-          <small>Wild-type alleles, slash notation, dominance, and examples.</small>
+          <small>Wild-type alleles, slash notation, dominance, sex-linked notation, and examples.</small>
         </span>
       </button>
 
@@ -843,7 +861,7 @@ button {
         <span class="stepIcon">🎯</span>
         <span class="stepText">
           <strong>Mixed quiz mode</strong>
-          <small>Randomized questions across all skills.</small>
+          <small>Unlocked after the three 10-question practice sections.</small>
         </span>
       </button>
 
@@ -877,10 +895,21 @@ let score = 0;
 let attempts = 0;
 let quizQuestionNumber = 0;
 let quizTotal = 10;
+let practiceQuestionNumber = 0;
+let practiceTotal = 10;
 let currentQuestion = null;
 let currentMode = "";
 let quizMode = false;
 let answered = false;
+let reportLog = [];
+let reportUnlocked = false;
+
+const sectionLabels = {
+  interpret: "Read a Genotype",
+  phenotype: "Predict Phenotype",
+  build: "Build the Genotype",
+  mixed: "Mixed Quiz"
+};
 
 const geneInfo = {
   w: { name: "white", wild: "red eyes", mutant: "white eyes", inheritance: "X-linked recessive" },
@@ -895,222 +924,276 @@ const geneInfo = {
 
 const interpretQuestions = [
   {
-    genotype: "w+/w",
-    answer: "heterozygous female for the recessive white mutation",
+    genotype: "Xw+/Xw",
+    answer: "heterozygous female for the recessive X-linked white mutation",
     choices: [
-      "heterozygous female for the recessive white mutation",
+      "heterozygous female for the recessive X-linked white mutation",
+      "hemizygous wild-type male for white",
       "homozygous mutant female for white",
-      "homozygous wild-type female at the white locus",
-      "heterozygous female for a dominant white mutation"
+      "heterozygous female for the autosomal sepia mutation"
     ],
-    explanation: "The notation w+/w shows one wild-type allele (w+) and one mutant white allele (w). Because white is recessive, this female is heterozygous and is expected to have red eyes."
+    explanation: "The white gene is X-linked in this app. A female has two X chromosomes, so Xw+/Xw means one X chromosome carries the wild-type white allele and the other X chromosome carries the mutant white allele. Because w is recessive, she is expected to have red eyes."
   },
   {
-    genotype: "w+/w+",
-    answer: "homozygous wild-type female at the white locus",
+    genotype: "Xw/Y",
+    answer: "hemizygous male with the recessive X-linked white mutation",
     choices: [
-      "homozygous wild-type female at the white locus",
-      "heterozygous female for white",
+      "hemizygous male with the recessive X-linked white mutation",
+      "heterozygous female carrier for white",
       "homozygous mutant female for white",
-      "heterozygous female for sepia"
+      "homozygous wild-type male at white"
     ],
-    explanation: "Both alleles are w+, so the fly is homozygous wild type at the white locus."
+    explanation: "Males have one X chromosome and one Y chromosome. The Y does not carry the white allele in this notation, so Xw/Y males show the recessive white-eye phenotype."
   },
   {
-    genotype: "w/w",
-    answer: "homozygous mutant female for white",
+    genotype: "Xw+/Y",
+    answer: "hemizygous wild-type male at the X-linked white locus",
     choices: [
-      "homozygous mutant female for white",
+      "hemizygous wild-type male at the X-linked white locus",
       "heterozygous female for white",
-      "homozygous wild-type female at the white locus",
-      "heterozygous dominant Curly mutant"
+      "homozygous wild-type female at white",
+      "male mutant for sepia"
     ],
-    explanation: "Both alleles are w, so this female is homozygous for the recessive white mutation and is expected to have white eyes."
+    explanation: "A male is written with one X-linked allele over Y. Xw+/Y means the X chromosome carries the wild-type allele, so the male is expected to have red eyes."
+  },
+  {
+    genotype: "Xw/Xw",
+    answer: "homozygous mutant female for the X-linked white mutation",
+    choices: [
+      "homozygous mutant female for the X-linked white mutation",
+      "hemizygous mutant male for white",
+      "heterozygous female carrier for white",
+      "homozygous wild-type female at white"
+    ],
+    explanation: "Because there are two X chromosomes and no Y, this is a female genotype. Two recessive Xw alleles produce white eyes."
   },
   {
     genotype: "se+/se",
-    answer: "heterozygous for the recessive sepia mutation",
+    answer: "heterozygous for the recessive autosomal sepia mutation",
     choices: [
-      "heterozygous for the recessive sepia mutation",
+      "heterozygous for the recessive autosomal sepia mutation",
+      "hemizygous male for an X-linked sepia mutation",
       "homozygous mutant for sepia",
-      "homozygous wild type at the sepia locus",
-      "heterozygous for the dominant Stubble mutation"
+      "heterozygous for a dominant Stubble mutation"
     ],
-    explanation: "The notation se+/se shows one wild-type sepia allele and one mutant sepia allele. Because sepia is recessive, the phenotype is expected to be red eyes."
+    explanation: "Sepia is treated as autosomal in this app, so both sexes use two alleles separated by a slash. se+/se is heterozygous and is expected to show red eyes."
   },
   {
     genotype: "se/se",
-    answer: "homozygous mutant for sepia",
+    answer: "homozygous mutant for the autosomal sepia mutation",
     choices: [
-      "homozygous mutant for sepia",
+      "homozygous mutant for the autosomal sepia mutation",
+      "hemizygous male for sepia",
       "heterozygous for sepia",
-      "homozygous wild type at the sepia locus",
-      "heterozygous for white"
+      "heterozygous female for X-linked white"
     ],
-    explanation: "Both autosomes carry the recessive sepia allele, so the fly is expected to show sepia/brown eyes."
+    explanation: "Both autosomal copies carry the recessive sepia allele, so the fly is expected to show sepia/brown eyes."
   },
   {
     genotype: "vg+/vg",
-    answer: "heterozygous for the recessive vestigial mutation",
+    answer: "heterozygous for the recessive autosomal vestigial mutation",
     choices: [
-      "heterozygous for the recessive vestigial mutation",
+      "heterozygous for the recessive autosomal vestigial mutation",
+      "hemizygous male for X-linked vestigial",
       "homozygous mutant for vestigial",
-      "homozygous wild type at the vestigial locus",
       "heterozygous dominant Curly mutant"
     ],
-    explanation: "The notation vg+/vg shows one wild-type allele and one recessive vestigial allele. The expected phenotype is normal wings."
+    explanation: "Vestigial is autosomal here. vg+/vg means one wild-type allele and one recessive mutant allele, so the fly is expected to have normal wings."
+  },
+  {
+    genotype: "e/e",
+    answer: "homozygous mutant for the autosomal ebony mutation",
+    choices: [
+      "homozygous mutant for the autosomal ebony mutation",
+      "hemizygous male with X-linked ebony",
+      "heterozygous ebony carrier",
+      "dominant ebony mutant"
+    ],
+    explanation: "Ebony is autosomal recessive in this app. e/e has two mutant alleles and is expected to produce an ebony/dark body phenotype."
   },
   {
     genotype: "Cy+/Cy",
-    answer: "heterozygous dominant Curly mutant",
+    answer: "heterozygous dominant autosomal Curly mutant",
     choices: [
-      "heterozygous dominant Curly mutant",
-      "homozygous wild type at the Curly locus",
+      "heterozygous dominant autosomal Curly mutant",
+      "hemizygous X-linked Curly male",
       "homozygous recessive vestigial mutant",
       "heterozygous recessive sepia carrier"
     ],
-    explanation: "Cy is dominant, so one Cy allele is enough to produce curly wings. The wild-type allele is written as Cy+."
+    explanation: "Cy is an autosomal dominant mutation in this app, so one Cy allele is enough to produce curly wings."
   },
   {
     genotype: "Sb+/Sb",
-    answer: "heterozygous dominant Stubble mutant",
+    answer: "heterozygous dominant autosomal Stubble mutant",
     choices: [
-      "heterozygous dominant Stubble mutant",
-      "homozygous wild type at the Stubble locus",
+      "heterozygous dominant autosomal Stubble mutant",
+      "hemizygous X-linked Stubble male",
       "homozygous mutant for sepia",
       "heterozygous recessive white carrier"
     ],
-    explanation: "Sb is dominant, so one Sb allele is enough to produce the Stubble bristle phenotype. The wild-type allele is written as Sb+."
+    explanation: "Sb is an autosomal dominant mutation in this app, so one Sb allele is enough to produce the Stubble bristle phenotype."
   }
 ];
 
 const phenotypeQuestions = [
   {
-    prompt: "What phenotype is expected for w+/w?",
-    genotype: "w+/w",
+    prompt: "What phenotype is expected for a female Xw+/Xw?",
+    genotype: "Xw+/Xw ♀",
     answer: "red eyes",
     choices: ["red eyes", "white eyes", "sepia/brown eyes", "vestigial wings"],
-    explanation: "w is recessive. A w+/w female has one wild-type allele, so the expected eye colour is red."
+    explanation: "The white gene is X-linked and w is recessive. A Xw+/Xw female has one wild-type allele on one X chromosome, so she is expected to have red eyes."
   },
   {
-    prompt: "What phenotype is expected for w/w?",
-    genotype: "w/w",
+    prompt: "What phenotype is expected for a male Xw/Y?",
+    genotype: "Xw/Y ♂",
     answer: "white eyes",
     choices: ["white eyes", "red eyes", "curly wings", "normal bristles"],
-    explanation: "w is recessive. A female with w/w has two mutant alleles and is expected to have white eyes."
+    explanation: "A male has only one X-linked white allele. With Xw/Y, the recessive w allele is expressed, so the expected phenotype is white eyes."
+  },
+  {
+    prompt: "What phenotype is expected for a male Xw+/Y?",
+    genotype: "Xw+/Y ♂",
+    answer: "red eyes",
+    choices: ["red eyes", "white eyes", "sepia/brown eyes", "ebony/dark body"],
+    explanation: "The X chromosome carries w+, the wild-type allele, so this male is expected to have red eyes."
+  },
+  {
+    prompt: "What phenotype is expected for a female Xw/Xw?",
+    genotype: "Xw/Xw ♀",
+    answer: "white eyes",
+    choices: ["white eyes", "red eyes", "curly wings", "normal wings"],
+    explanation: "A female with Xw/Xw has the recessive mutant allele on both X chromosomes and is expected to have white eyes."
   },
   {
     prompt: "What phenotype is expected for se+/se?",
     genotype: "se+/se",
     answer: "red eyes",
     choices: ["red eyes", "sepia/brown eyes", "white eyes", "ebony/dark body"],
-    explanation: "se is recessive. A heterozygous se+/se fly is expected to have wild-type red eyes."
+    explanation: "Sepia is autosomal recessive in this app. A heterozygous se+/se fly is expected to have wild-type red eyes."
   },
   {
     prompt: "What phenotype is expected for se/se?",
     genotype: "se/se",
     answer: "sepia/brown eyes",
     choices: ["sepia/brown eyes", "red eyes", "white eyes", "normal wings"],
-    explanation: "se is recessive. A homozygous se/se fly shows sepia/brown eyes."
+    explanation: "se is autosomal recessive. A homozygous se/se fly shows sepia/brown eyes."
   },
   {
     prompt: "What phenotype is expected for vg+/vg?",
     genotype: "vg+/vg",
     answer: "normal wings",
     choices: ["normal wings", "vestigial wings", "curly wings", "white eyes"],
-    explanation: "vg is recessive. A vg+/vg fly has one wild-type allele, so the expected phenotype is normal wings."
+    explanation: "vg is autosomal recessive. A vg+/vg fly has one wild-type allele, so the expected phenotype is normal wings."
   },
   {
     prompt: "What phenotype is expected for vg/vg?",
     genotype: "vg/vg",
     answer: "vestigial wings",
     choices: ["vestigial wings", "normal wings", "curly wings", "sepia/brown eyes"],
-    explanation: "vg is recessive. Homozygous vg/vg flies have vestigial wings."
+    explanation: "vg is autosomal recessive. Homozygous vg/vg flies have vestigial wings."
   },
   {
-    prompt: "What phenotype is expected for e+/e?",
-    genotype: "e+/e",
-    answer: "normal body",
-    choices: ["normal body", "ebony/dark body", "white eyes", "sepia/brown eyes"],
-    explanation: "e is recessive. A heterozygous e+/e fly usually has a normal body."
+    prompt: "What phenotype is expected for e/e?",
+    genotype: "e/e",
+    answer: "ebony/dark body",
+    choices: ["ebony/dark body", "normal body", "white eyes", "sepia/brown eyes"],
+    explanation: "e is autosomal recessive. A homozygous e/e fly is expected to have an ebony/dark body."
   },
   {
     prompt: "What phenotype is expected for Cy+/Cy?",
     genotype: "Cy+/Cy",
     answer: "curly wings",
     choices: ["curly wings", "normal wings", "vestigial wings", "white eyes"],
-    explanation: "Cy is dominant, so one Cy allele produces curly wings."
-  },
-  {
-    prompt: "What phenotype is expected for Cy+/Cy+?",
-    genotype: "Cy+/Cy+",
-    answer: "normal wings",
-    choices: ["normal wings", "curly wings", "vestigial wings", "white eyes"],
-    explanation: "The fly has two wild-type alleles at the Curly locus, so the expected phenotype is normal wings."
+    explanation: "Cy is autosomal dominant, so one Cy allele produces curly wings."
   },
   {
     prompt: "What phenotype is expected for Sb+/Sb?",
     genotype: "Sb+/Sb",
     answer: "stubble bristles",
     choices: ["stubble bristles", "normal bristles", "curly wings", "white eyes"],
-    explanation: "Sb is dominant, so one copy produces the Stubble bristle phenotype."
+    explanation: "Sb is autosomal dominant, so one copy produces the Stubble bristle phenotype."
+  },
+  {
+    prompt: "What phenotype is expected for L+/L?",
+    genotype: "L+/L",
+    answer: "lobe eyes",
+    choices: ["lobe eyes", "normal eyes", "white eyes", "sepia/brown eyes"],
+    explanation: "Lobe is treated as autosomal dominant here. One L allele is enough to produce lobe eyes."
   }
 ];
 
 const buildQuestions = [
   {
-    prompt: "Write the genotype for a female heterozygous for the recessive white mutation. Put the wild-type allele first.",
-    answer: "w+/w",
-    acceptable: ["w+/w"],
-    explanation: "The wild-type allele for white is written w+. A heterozygous female is written w+/w, with the wild-type allele first in this app."
+    prompt: "Write the genotype for a female heterozygous for the recessive X-linked white mutation. Put the wild-type allele first.",
+    answer: "Xw+/Xw",
+    acceptable: ["Xw+/Xw"],
+    explanation: "A female has two X chromosomes, so both X chromosomes are shown. Heterozygous female notation is Xw+/Xw."
+  },
+  {
+    prompt: "Write the genotype for a male with white eyes caused by the X-linked white mutation.",
+    answer: "Xw/Y",
+    acceptable: ["Xw/Y", "w/y"],
+    explanation: "For an X-linked gene in a male, write the allele on the X chromosome over Y. A white-eyed male is Xw/Y."
+  },
+  {
+    prompt: "Write the genotype for a wild-type male at the X-linked white locus.",
+    answer: "Xw+/Y",
+    acceptable: ["Xw+/Y", "w+/y"],
+    explanation: "A wild-type male carries w+ on the X chromosome and Y as the sex chromosome partner: Xw+/Y."
   },
   {
     prompt: "Write the genotype for a female homozygous wild type at the white locus.",
-    answer: "w+/w+",
-    acceptable: ["w+/w+"],
-    explanation: "Both alleles are wild type for the white gene, so the genotype is w+/w+."
+    answer: "Xw+/Xw+",
+    acceptable: ["Xw+/Xw+"],
+    explanation: "Both X chromosomes carry the wild-type allele for white, so the genotype is Xw+/Xw+."
   },
   {
     prompt: "Write the genotype for a female homozygous mutant for white.",
-    answer: "w/w",
-    acceptable: ["w/w"],
-    explanation: "A homozygous mutant female for white has two w alleles: w/w."
+    answer: "Xw/Xw",
+    acceptable: ["Xw/Xw"],
+    explanation: "A homozygous mutant female for white has the mutant allele on both X chromosomes: Xw/Xw."
   },
   {
-    prompt: "Write the genotype for a fly heterozygous for sepia. Put the wild-type allele first.",
+    prompt: "Write the genotype for a fly heterozygous for autosomal sepia. Put the wild-type allele first.",
     answer: "se+/se",
     acceptable: ["se+/se"],
-    explanation: "The wild-type allele for sepia is se+. Heterozygous sepia is written se+/se."
+    explanation: "Sepia is autosomal in this app. The wild-type allele is se+, so heterozygous sepia is se+/se."
   },
   {
-    prompt: "Write the genotype for a fly homozygous mutant for sepia.",
+    prompt: "Write the genotype for a fly homozygous mutant for autosomal sepia.",
     answer: "se/se",
     acceptable: ["se/se"],
     explanation: "Sepia is autosomal, so homozygous mutant is written se/se."
   },
   {
-    prompt: "Write the genotype for a fly heterozygous for vestigial. Put the wild-type allele first.",
+    prompt: "Write the genotype for a fly heterozygous for autosomal vestigial. Put the wild-type allele first.",
     answer: "vg+/vg",
     acceptable: ["vg+/vg"],
     explanation: "The wild-type allele for vestigial is vg+. Heterozygous vestigial is written vg+/vg."
   },
   {
-    prompt: "Write the genotype for a fly homozygous wild type at the vestigial locus.",
-    answer: "vg+/vg+",
-    acceptable: ["vg+/vg+"],
-    explanation: "Both alleles are wild type for vestigial, so the genotype is vg+/vg+."
+    prompt: "Write the genotype for a fly homozygous mutant for autosomal ebony.",
+    answer: "e/e",
+    acceptable: ["e/e"],
+    explanation: "Ebony is autosomal recessive in this app, so homozygous mutant is written e/e."
   },
   {
-    prompt: "Write the genotype for a fly heterozygous for the dominant Curly mutation. Put the wild-type allele first.",
+    prompt: "Write the genotype for a fly heterozygous for the dominant autosomal Curly mutation. Put the wild-type allele first.",
     answer: "Cy+/Cy",
     acceptable: ["Cy+/Cy"],
     explanation: "The wild-type allele is Cy+. The dominant mutant allele is Cy. In this app, write the wild-type allele first: Cy+/Cy."
   },
   {
-    prompt: "Write the genotype for a fly heterozygous for the dominant Stubble mutation. Put the wild-type allele first.",
+    prompt: "Write the genotype for a fly heterozygous for the dominant autosomal Stubble mutation. Put the wild-type allele first.",
     answer: "Sb+/Sb",
     acceptable: ["Sb+/Sb"],
     explanation: "The wild-type allele is Sb+. The dominant mutant allele is Sb. In this app, write the wild-type allele first: Sb+/Sb."
+  },
+  {
+    prompt: "Write the genotype for a fly heterozygous for the dominant autosomal Lobe mutation. Put the wild-type allele first.",
+    answer: "L+/L",
+    acceptable: ["L+/L"],
+    explanation: "The wild-type allele is L+. The dominant mutant allele is L, so heterozygous Lobe is written L+/L."
   }
 ];
 
@@ -1129,12 +1212,25 @@ function showLesson() {
       <h2>Core symbols</h2>
       <div class="grid">
         <div class="miniCard"><h3>Gene-specific +</h3><p>The plus sign marks the <b>wild-type allele of a specific gene</b>. Examples: <b>w+</b>, <b>se+</b>, <b>vg+</b>, <b>Cy+</b>.</p></div>
-        <div class="miniCard"><h3>/</h3><p>The slash separates the two allele copies. Example: <b>se+/se</b> means one wild-type sepia allele and one mutant sepia allele.</p></div>
-        <div class="miniCard"><h3>Order used here</h3><p>When a wild-type and mutant allele are shown together, this app places the wild-type allele first: <b>w+/w</b>, <b>vg+/vg</b>, <b>Cy+/Cy</b>.</p></div>
+        <div class="miniCard"><h3>/</h3><p>The slash separates the two allele copies or sex chromosomes. Example: <b>se+/se</b> means one wild-type sepia allele and one mutant sepia allele; <b>Xw+/Y</b> means one X chromosome carrying w+ and one Y chromosome.</p></div>
+        <div class="miniCard"><h3>Order used here</h3><p>When a wild-type and mutant allele are shown together, this app places the wild-type allele first: <b>Xw+/Xw</b>, <b>vg+/vg</b>, <b>Cy+/Cy</b>.</p></div>
         <div class="miniCard"><h3>Allele symbols</h3><p><b>w</b> = white, <b>se</b> = sepia, <b>vg</b> = vestigial, <b>e</b> = ebony, <b>Cy</b> = Curly.</p></div>
       </div>
-      <div class="warning"><b>Important:</b> In this app, slash notation is the standard typing format. Use <b>/</b> to separate allele copies. Use gene-specific wild-type alleles such as <b>w+</b>, not just <b>+</b>, when answering questions.</div>
+      <div class="warning"><b>Important:</b> In this app, slash notation is the standard typing format. Use <b>/</b> to separate allele copies. Use gene-specific wild-type alleles such as <b>w+</b>, not just <b>+</b>, when answering questions. For X-linked white genotypes, include the chromosome symbol: <b>Xw+/Xw</b>, <b>Xw/Xw</b>, <b>Xw+/Y</b>, or <b>Xw/Y</b>. Lowercase chromosome symbols such as <b>xw/y</b> are accepted when students type answers.</div>
       <div class="info"><b>Historical note:</b> Some classical <em>Drosophila</em> genetics courses used stacked or “bar” notation for X-linked genes. In this app, slash notation is used throughout because it is easier for typing, mobile devices, databases, and digital genetics tools.</div>
+    </div>
+
+    <div class="card">
+      <h2>Sex-linked genes: female vs. male notation</h2>
+      <p>For an <b>X-linked gene</b>, write the allele directly on the X chromosome. Females have two X chromosomes, so they are written as <b>Xw+/Xw</b>, <b>Xw/Xw</b>, or <b>Xw+/Xw+</b>. Males have one X chromosome and one Y chromosome, so they are written as <b>Xw+/Y</b> or <b>Xw/Y</b>.</p>
+      <table>
+        <tr><th>Genotype</th><th>Sex</th><th>Meaning</th><th>Expected phenotype</th></tr>
+        <tr><td><b>Xw+/Xw</b></td><td>Female</td><td>Heterozygous carrier for the X-linked white mutation</td><td>Red eyes</td></tr>
+        <tr><td><b>Xw/Xw</b></td><td>Female</td><td>Homozygous mutant for the X-linked white mutation</td><td>White eyes</td></tr>
+        <tr><td><b>Xw+/Y</b></td><td>Male</td><td>Wild-type allele on the X chromosome</td><td>Red eyes</td></tr>
+        <tr><td><b>Xw/Y</b></td><td>Male</td><td>Mutant white allele on the X chromosome</td><td>White eyes</td></tr>
+      </table>
+      <div class="success"><b>Key idea:</b> A recessive X-linked mutation can show in males with only one mutant allele because males have no second X-linked copy to mask it.</div>
     </div>
 
     <div class="card">
@@ -1164,14 +1260,18 @@ function showLesson() {
       <h2>Mini reference table</h2>
       <table>
         <tr><th>Genotype</th><th>Meaning</th><th>Expected phenotype</th></tr>
-        <tr><td>w+/w+</td><td>Female homozygous wild type at white locus</td><td>Red eyes</td></tr>
-        <tr><td>w+/w</td><td>Female heterozygous for white</td><td>Red eyes</td></tr>
-        <tr><td>w/w</td><td>Female homozygous mutant for white</td><td>White eyes</td></tr>
+        <tr><td>Xw+/Xw+</td><td>Female homozygous wild type at X-linked white locus</td><td>Red eyes</td></tr>
+        <tr><td>Xw+/Xw</td><td>Female heterozygous for X-linked white</td><td>Red eyes</td></tr>
+        <tr><td>Xw/Xw</td><td>Female homozygous mutant for X-linked white</td><td>White eyes</td></tr>
+        <tr><td>Xw+/Y</td><td>Male wild type at X-linked white locus</td><td>Red eyes</td></tr>
+        <tr><td>Xw/Y</td><td>Male mutant for X-linked white</td><td>White eyes</td></tr>
         <tr><td>se+/se</td><td>Heterozygous for sepia</td><td>Red eyes</td></tr>
         <tr><td>se/se</td><td>Homozygous mutant for sepia</td><td>Sepia/brown eyes</td></tr>
         <tr><td>vg+/vg</td><td>Heterozygous for vestigial</td><td>Normal wings</td></tr>
         <tr><td>Cy+/Cy</td><td>Heterozygous dominant Curly mutant</td><td>Curly wings</td></tr>
         <tr><td>Sb+/Sb</td><td>Heterozygous dominant Stubble mutant</td><td>Stubble bristles</td></tr>
+        <tr><td>e/e</td><td>Homozygous recessive ebony mutant</td><td>Ebony/dark body</td></tr>
+        <tr><td>L+/L</td><td>Heterozygous dominant Lobe mutant</td><td>Lobe eyes</td></tr>
       </table>
       <button onclick="startPractice('interpret')">Start Practice</button>
     </div>
@@ -1182,6 +1282,11 @@ function startPractice(mode) {
   clearAll();
   score = 0;
   attempts = 0;
+  practiceQuestionNumber = 0;
+  if (mode === "interpret") {
+    reportLog = [];
+    reportUnlocked = false;
+  }
   quizMode = false;
   currentMode = mode;
   showScore();
@@ -1193,6 +1298,8 @@ function startQuiz() {
   score = 0;
   attempts = 0;
   quizQuestionNumber = 0;
+  practiceQuestionNumber = 0;
+  reportUnlocked = false;
   quizMode = true;
   currentMode = "mixed";
   showScore();
@@ -1213,9 +1320,57 @@ function nextQuizQuestion() {
 function nextQuestion(mode) {
   answered = false;
   document.getElementById("feedback").innerHTML = "";
+
+  if (!quizMode) {
+    if (practiceQuestionNumber >= practiceTotal) {
+      showSectionComplete(mode);
+      return;
+    }
+    practiceQuestionNumber++;
+  }
+
   if (mode === "interpret") showInterpretQuestion();
   if (mode === "phenotype") showPhenotypeQuestion();
   if (mode === "build") showBuildQuestion();
+}
+
+function showSectionComplete(mode) {
+  document.getElementById("activity").innerHTML = "";
+  document.getElementById("feedback").innerHTML = "";
+
+  const percent = attempts === 0 ? 0 : Math.round((score / attempts) * 100);
+  const nextMap = {
+    interpret: {
+      title: "Read the Genotype Complete",
+      message: "Great. You finished 10 genotype-reading questions. Now move into phenotype prediction.",
+      button: "Move to Predict Phenotype",
+      action: "startPractice('phenotype')"
+    },
+    phenotype: {
+      title: "Predict Phenotype Complete",
+      message: "Nice work. You finished 10 phenotype-prediction questions. Now move into building genotypes yourself.",
+      button: "Move to Build the Genotype",
+      action: "startPractice('build')"
+    },
+    build: {
+      title: "Build the Genotype Complete",
+      message: "Excellent. You finished 10 genotype-building questions. Mixed quiz mode is now ready.",
+      button: "Move to Mixed Quiz Mode",
+      action: "startQuiz()"
+    }
+  };
+
+  const next = nextMap[mode];
+  document.getElementById("output").innerHTML = `
+    <div class="card">
+      <h2>${next.title}</h2>
+      <div class="notationBox">${score} / ${attempts}<br><span class="smallText">${percent}%</span></div>
+      <div class="${percent >= 70 ? 'success' : 'warning'}"><b>${next.message}</b></div>
+      <button onclick="${next.action}">${next.button}</button>
+      <button onclick="startPractice('${mode}')">Repeat This Section</button>
+      <button class="exitButton" onclick="exitApp()">Exit / Refresh</button>
+    </div>
+  `;
 }
 
 function sample(array) {
@@ -1228,7 +1383,7 @@ function showInterpretQuestion() {
 
   document.getElementById("activity").innerHTML = `
     <div class="card">
-      <h2>${quizMode ? "Mixed Quiz " + quizQuestionNumber + " of " + quizTotal : "Read the genotype"}</h2>
+      <h2>${quizMode ? "Mixed Quiz " + quizQuestionNumber + " of " + quizTotal : "Read the genotype " + practiceQuestionNumber + " of " + practiceTotal}</h2>
       <p>What does this genotype mean?</p>
       <div class="notationBox">
         ${currentQuestion.genotype}<br>
@@ -1244,7 +1399,7 @@ function showPhenotypeQuestion() {
   currentQuestion = sample(phenotypeQuestions);
   document.getElementById("activity").innerHTML = `
     <div class="card">
-      <h2>${quizMode ? "Mixed Quiz " + quizQuestionNumber + " of " + quizTotal : "Predict the phenotype"}</h2>
+      <h2>${quizMode ? "Mixed Quiz " + quizQuestionNumber + " of " + quizTotal : "Predict the phenotype " + practiceQuestionNumber + " of " + practiceTotal}</h2>
       <p>${currentQuestion.prompt}</p>
       <div class="notationBox">${currentQuestion.genotype}</div>
       <div class="choiceGrid">
@@ -1258,12 +1413,12 @@ function showBuildQuestion() {
   currentQuestion = sample(buildQuestions);
   document.getElementById("activity").innerHTML = `
     <div class="card">
-      <h2>${quizMode ? "Mixed Quiz " + quizQuestionNumber + " of " + quizTotal : "Build the genotype"}</h2>
+      <h2>${quizMode ? "Mixed Quiz " + quizQuestionNumber + " of " + quizTotal : "Build the genotype " + practiceQuestionNumber + " of " + practiceTotal}</h2>
       <p>${currentQuestion.prompt}</p>
       <label for="studentAnswer">Type your answer using slash notation:</label>
-      <input id="studentAnswer" placeholder="Example: w+/w or se+/se" onkeydown="if(event.key==='Enter'){checkTypedAnswer();}">
+      <input id="studentAnswer" placeholder="Example: Xw+/Xw, Xw/Y, or se+/se" onkeydown="if(event.key==='Enter'){checkTypedAnswer();}">
       <button onclick="checkTypedAnswer()">Check Answer</button>
-      <div class="info"><b>Typing tip:</b> Use <b>/</b> between alleles. Use gene-specific wild-type alleles such as <b>w+</b>, <b>se+</b>, or <b>vg+</b>. Put the wild-type allele first.</div>
+      <div class="info"><b>Typing tip:</b> Use <b>/</b> between alleles or sex chromosomes. For the X-linked white gene, include the X chromosome: <b>Xw+/Xw</b>, <b>Xw/Xw</b>, <b>Xw+/Y</b>, or <b>Xw/Y</b>. Lowercase chromosome letters are accepted too, so <b>xw/y</b> is treated as <b>Xw/Y</b>. Put the wild-type allele first when present.</div>
     </div>
   `;
   setTimeout(() => document.getElementById("studentAnswer").focus(), 100);
@@ -1280,6 +1435,8 @@ function checkChoice(button, selected) {
     b.disabled = true;
     if (b.textContent === currentQuestion.answer) b.classList.add("correct");
   });
+
+  recordQuestionResult(selected, currentQuestion.answer, correct, "multiple choice");
 
   if (correct) {
     score++;
@@ -1300,7 +1457,10 @@ function checkTypedAnswer() {
   attempts++;
   answered = true;
 
-  if (acceptable.includes(answer)) {
+  const isCorrect = acceptable.includes(answer);
+  recordQuestionResult(input.value, currentQuestion.answer, isCorrect, "typed answer");
+
+  if (isCorrect) {
     score++;
     input.style.backgroundColor = "#dcfce7";
     showFeedback(true, currentQuestion.explanation);
@@ -1315,7 +1475,7 @@ function checkTypedAnswer() {
 function showFeedback(correct, explanation) {
   const nextButton = quizMode
     ? `<button onclick="nextQuizQuestion()">Next Quiz Question</button>`
-    : `<button onclick="nextQuestion('${currentMode}')">Next Question</button>`;
+    : `<button onclick="nextQuestion('${currentMode}')">${practiceQuestionNumber >= practiceTotal ? 'Continue' : 'Next Question'}</button>`;
 
   document.getElementById("feedback").innerHTML = `
     <div class="${correct ? 'success' : 'error'}">
@@ -1328,7 +1488,9 @@ function showFeedback(correct, explanation) {
 
 function showScore() {
   const percent = attempts === 0 ? 0 : Math.round((score / attempts) * 100);
-  const quizText = quizMode ? `<p><b>Quiz progress:</b> ${quizQuestionNumber} of ${quizTotal}</p>` : "";
+  const quizText = quizMode
+    ? `<p><b>Quiz progress:</b> ${quizQuestionNumber} of ${quizTotal}</p>`
+    : `<p><b>Section progress:</b> ${practiceQuestionNumber} of ${practiceTotal}</p>`;
   document.getElementById("scorePanel").innerHTML = `
     <div class="card">
       <h2>Progress</h2>
@@ -1341,6 +1503,7 @@ function showScore() {
 
 function showFinalQuiz() {
   clearAll();
+  reportUnlocked = true;
   const percent = Math.round((score / attempts) * 100);
   let message = "Good start — review the lesson and try again.";
   if (percent >= 80) message = "Excellent work. You are ready to move into crosses.";
@@ -1351,6 +1514,7 @@ function showFinalQuiz() {
       <h2>Quiz Complete</h2>
       <div class="notationBox">${score} / ${attempts}<br><span class="smallText">${percent}%</span></div>
       <div class="${percent >= 80 ? 'success' : 'warning'}"><b>${message}</b></div>
+      <button class="exportButton" onclick="exportPDF()">Export Report as PDF</button>
       <button onclick="startQuiz()">Try Another Mixed Quiz</button>
       <button onclick="showLesson()">Review Lesson</button>
       <button class="exitButton" onclick="exitApp()">Exit / Refresh</button>
@@ -1377,8 +1541,243 @@ function escapeText(text) {
   return text.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
 }
 
+function escapeHTML(text) {
+  return String(text ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function normalize(text) {
-  return text.trim().replace(/\s+/g, "");
+  let clean = String(text || "").trim().replace(/\s+/g, "");
+  if (clean.includes("/")) {
+    clean = clean.split("/").map(part => {
+      if (/^x/i.test(part)) return "X" + part.slice(1);
+      if (/^y$/i.test(part)) return "Y";
+      return part;
+    }).join("/");
+  } else {
+    if (/^x/i.test(clean)) clean = "X" + clean.slice(1);
+    if (/^y$/i.test(clean)) clean = "Y";
+  }
+  return clean;
+}
+
+function getCurrentPromptText() {
+  if (!currentQuestion) return "";
+  if (currentMode === "interpret" || (!quizMode && currentQuestion.genotype && !currentQuestion.prompt)) {
+    return `What does this genotype mean? ${currentQuestion.genotype}`;
+  }
+  if (currentQuestion.prompt) return currentQuestion.prompt;
+  return currentQuestion.genotype || "";
+}
+
+function recordQuestionResult(studentAnswer, correctAnswer, isCorrect, responseType) {
+  const modeForLog = quizMode ? "mixed" : currentMode;
+  const sourceMode = quizMode
+    ? (currentQuestion.prompt && currentQuestion.prompt.toLowerCase().includes("phenotype") ? "phenotype" : (responseType === "typed answer" ? "build" : "interpret"))
+    : currentMode;
+
+  reportLog.push({
+    section: sectionLabels[modeForLog] || modeForLog,
+    skill: sectionLabels[sourceMode] || sourceMode,
+    number: quizMode ? quizQuestionNumber : practiceQuestionNumber,
+    question: getCurrentPromptText(),
+    displayedGenotype: currentQuestion.genotype || "",
+    studentAnswer: String(studentAnswer || ""),
+    correctAnswer: String(correctAnswer || ""),
+    result: isCorrect ? "Correct" : "Incorrect",
+    responseType: responseType,
+    explanation: currentQuestion.explanation || ""
+  });
+}
+
+function summarizeReportLog() {
+  const summary = {};
+  reportLog.forEach(item => {
+    if (!summary[item.section]) summary[item.section] = { total: 0, correct: 0 };
+    summary[item.section].total++;
+    if (item.result === "Correct") summary[item.section].correct++;
+  });
+
+  return Object.keys(summary).map(section => {
+    const s = summary[section];
+    const percent = s.total === 0 ? 0 : Math.round((s.correct / s.total) * 100);
+    return `<tr><td>${escapeHTML(section)}</td><td>${s.correct}</td><td>${s.total}</td><td>${percent}%</td></tr>`;
+  }).join("");
+}
+
+function buildQuestionReportRows() {
+  return reportLog.map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${escapeHTML(item.section)}</td>
+      <td>${escapeHTML(item.skill)}</td>
+      <td>${escapeHTML(item.question)}</td>
+      <td>${escapeHTML(item.displayedGenotype)}</td>
+      <td>${escapeHTML(item.studentAnswer)}</td>
+      <td>${escapeHTML(item.correctAnswer)}</td>
+      <td>${escapeHTML(item.result)}</td>
+    </tr>
+  `).join("");
+}
+
+function exportPDF() {
+  if (!reportUnlocked) {
+    alert("Complete the guided practice and mixed quiz before exporting the report.");
+    return;
+  }
+
+  if (!window.html2canvas || !window.jspdf) {
+    alert("PDF export libraries are still loading. Please wait a few seconds and try again.");
+    return;
+  }
+
+  let studentName = prompt("Enter Student Name:");
+  if (!studentName) {
+    alert("Student Name is required.");
+    return;
+  }
+
+  let nsid = prompt("Enter NSID:");
+  if (!nsid) {
+    alert("NSID is required.");
+    return;
+  }
+
+  const now = new Date();
+  const timestamp = now.toLocaleString("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
+  const totalCorrect = reportLog.filter(item => item.result === "Correct").length;
+  const totalAnswered = reportLog.length;
+  const totalPercent = totalAnswered === 0 ? 0 : Math.round((totalCorrect / totalAnswered) * 100);
+
+  let report = document.createElement("div");
+  report.style.background = "white";
+  report.style.padding = "45px";
+  report.style.fontFamily = "Arial";
+  report.style.width = "900px";
+  report.style.position = "absolute";
+  report.style.left = "-9999px";
+  report.style.top = "0";
+
+  report.innerHTML = `
+    <div style="line-height:1.5; color:#0f172a;">
+      <h1 style="text-align:center; margin-bottom:25px;"><em>Drosophila</em> Notation Trainer Report</h1>
+
+      <p><b>Student Name:</b> ${escapeHTML(studentName)}</p>
+      <p><b>NSID:</b> ${escapeHTML(nsid)}</p>
+      <p><b>Timestamp:</b> ${escapeHTML(timestamp)}</p>
+      <p><b>Total score:</b> ${totalCorrect} / ${totalAnswered} (${totalPercent}%)</p>
+
+      <hr style="margin-top:20px; margin-bottom:20px;">
+
+      <div class="card">
+        <h2>Activity Summary</h2>
+        <table>
+          <tr><th>Section</th><th>Correct</th><th>Total</th><th>Percent</th></tr>
+          ${summarizeReportLog()}
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Questions Solved by the Student</h2>
+        <table style="font-size:12px;">
+          <tr>
+            <th>#</th>
+            <th>Section</th>
+            <th>Skill</th>
+            <th>Question</th>
+            <th>Displayed genotype</th>
+            <th>Student answer</th>
+            <th>Expected answer</th>
+            <th>Result</th>
+          </tr>
+          ${buildQuestionReportRows()}
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Notation Reference Used in This Activity</h2>
+        <p>For X-linked white genotypes, this activity uses explicit chromosome notation: <b>Xw+/Xw+</b>, <b>Xw+/Xw</b>, <b>Xw/Xw</b>, <b>Xw+/Y</b>, and <b>Xw/Y</b>. Student typed answers using lowercase chromosome symbols, such as <b>xw/y</b>, were accepted as equivalent.</p>
+      </div>
+
+      <div style="text-align:center; font-size:15px; margin-top:25px; color:#555;">
+        Dr. Andres Posso-Terranova. 2026. ©
+      </div>
+
+      <div style="height:80px;"></div>
+    </div>
+  `;
+
+  document.body.appendChild(report);
+
+  html2canvas(report, { scale: 1 }).then(canvas => {
+    const { jsPDF } = window.jspdf;
+
+    let pdf = new jsPDF("p", "mm", "a4");
+    let pageWidth = pdf.internal.pageSize.getWidth();
+    let pageHeight = pdf.internal.pageSize.getHeight();
+
+    let marginLeft = 15;
+    let marginTop = 15;
+    let marginBottom = 35;
+
+    let imgWidth = pageWidth - 30;
+    let usablePageHeight = pageHeight - marginTop - marginBottom;
+
+    let pageCanvasHeight = Math.floor(canvas.width * usablePageHeight / imgWidth);
+    let sourceY = 0;
+    let pageNumber = 0;
+
+    while (sourceY < canvas.height) {
+      let sliceHeight = Math.min(pageCanvasHeight, canvas.height - sourceY);
+
+      let pageCanvas = document.createElement("canvas");
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sliceHeight;
+
+      let pageContext = pageCanvas.getContext("2d");
+      pageContext.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        sliceHeight,
+        0,
+        0,
+        canvas.width,
+        sliceHeight
+      );
+
+      let pageImgData = pageCanvas.toDataURL("image/jpeg", 0.72);
+      let pageImgHeight = sliceHeight * imgWidth / canvas.width;
+
+      if (pageNumber > 0) {
+        pdf.addPage();
+      }
+
+      pdf.addImage(pageImgData, "JPEG", marginLeft, marginTop, imgWidth, pageImgHeight);
+
+      sourceY += pageCanvasHeight;
+      pageNumber++;
+    }
+
+    let cleanName = studentName.replace(/\s+/g, "_");
+    let cleanNSID = nsid.replace(/\s+/g, "_");
+    pdf.save(`drosophila_notation_report_${cleanName}_${cleanNSID}.pdf`);
+
+    document.body.removeChild(report);
+  });
 }
 
 function exitApp() {
