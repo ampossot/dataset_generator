@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOL 226 Assignment 3 - Fillable HTML</title>
+
+<!--
+====================================================
+BIOL 226 Assignment Framework
+Version: 1.0
+Framework Last Updated: July 2026
+
+Maintainer:
+Dr. Andrés Posso-Terranova
+University of Saskatchewan
+
+This file is the reusable BIOL 226 assignment framework.
+Do not modify framework code unless updating the BIOL 226 template.
+
+Future assignments should usually edit only:
+- <body data-lab="3">
+- toolbar title
+- assignment title/subtitle
+- Assignment Content section
+- assignment-specific JavaScript section, if needed
+====================================================
+-->
+
+<style>
+/* ==================================================
+   1. CSS VARIABLES
+   ================================================== */
+:root{
+  --green:#8abd72;
+  --green-dark:#315b2d;
+  --green-soft:#eef8e9;
+  --green-mid:#dfeeda;
+  --line:#d8ded6;
+  --ink:#161616;
+  --field:#fbfffb;
+  --field-border:#9db892;
+  --worksheet-width:1120px;
+}
+
+/* ==================================================
+   2. GLOBAL STYLES
+   ================================================== */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-width:calc(var(--worksheet-width) + 40px);
+  overflow-x:auto;
+  background:#eef4ec;
+  color:var(--ink);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:18px;
+  line-height:1.25;
+}
+h1{
+  margin:0 0 6px;
+  font-size:2.2rem;
+  letter-spacing:.02em;
+  color:#1f4a21;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin:16px 0 22px;
+  display:table;
+  table-layout:auto;
+}
+th,td{
+  border:1px solid var(--line);
+  padding:10px 9px;
+  text-align:center;
+  vertical-align:middle;
+}
+th{font-weight:bold}
+input,textarea,select{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:1rem;
+  border:1px solid var(--field-border);
+  background:var(--field);
+  border-radius:6px;
+  padding:7px 8px;
+  width:100%;
+}
+textarea{
+  min-height:120px;
+  resize:vertical;
+  overflow:hidden;
+}
+input:focus,textarea:focus,select:focus{
+  outline:2px solid #5fa7ff;
+  background:#fff;
+}
+input[type="checkbox"],
+input[type="radio"]{
+  width:22px;
+  height:22px;
+  accent-color:#3c7b35;
+}
+
+/* ==================================================
+   3. TOOLBAR
+   ================================================== */
+.toolbar{
+  position:sticky;
+  top:0;
+  z-index:999;
+  background:linear-gradient(135deg,#14351a,#3c7b35);
+  color:#fff;
+  padding:12px 16px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+.toolbar strong{margin-right:6px}
+.toolbar button{
+  border:0;
+  border-radius:999px;
+  background:#fff;
+  color:#173a1a;
+  padding:9px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+.toolbar button:hover{filter:brightness(.94)}
+
+/* ==================================================
+   4. WORKSHEET LAYOUT
+   ================================================== */
+.sheet{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+  margin:24px auto 44px;
+  background:#fff;
+  border:2px solid var(--green);
+  border-radius:30px;
+  padding:28px 38px 42px !important;
+  box-shadow:0 18px 42px rgba(0,0,0,.13);
+  position:relative;
+}
+.header{
+  position:relative;
+  background:linear-gradient(180deg,#e9f5e5,#f6fbf3);
+  border:1px solid #cfe3c9;
+  border-radius:18px;
+  padding:18px 24px 20px;
+  text-align:center;
+  margin-bottom:26px;
+}
+.logo{
+  position:absolute;
+  top:10px;
+  left:12px;
+  width:54px;
+}
+.subtitle{
+  font-variant:small-caps;
+  font-weight:bold;
+  font-size:1.4rem;
+  color:#173a1a;
+}
+.option-line{font-size:1.08rem;margin:2px 0}
+.student-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto 150px auto 150px;
+  gap:8px 10px;
+  align-items:center;
+  margin-top:20px;
+  text-align:left;
+}
+.section-title{
+  display:block;
+  width:max-content;
+  max-width:100%;
+  margin:34px auto 18px;
+  background:linear-gradient(180deg,#e9eee7,#d8e0d5);
+  border-radius:10px;
+  padding:2px 8px;
+  font-weight:bold;
+  font-variant:small-caps;
+  text-align:center;
+}
+.instructions{
+  margin:16px 0;
+  padding:12px 14px;
+  background:linear-gradient(90deg,var(--green-soft),#fff);
+  border-left:4px solid var(--green);
+  border-radius:10px;
+}
+.hint{
+  max-width:980px;
+  margin:18px auto;
+  padding:14px 18px;
+  border:1px solid #c8dbc0;
+  border-radius:14px;
+  background:linear-gradient(180deg,#f4fbf0,#fff);
+  text-align:center;
+}
+.page-break,
+.q2-print-start,
+.q5-print-start,
+.q4-soft-break{
+  display:none !important;
+  height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+.small-field{max-width:95px;display:inline-block}
+.medium-field{max-width:170px;display:inline-block}
+.long-answer{min-height:170px}
+.huge-answer{min-height:260px}
+.final-note{
+  margin:40px auto 0;
+  text-align:center;
+  background:#f2f2f2;
+  padding:16px;
+  max-width:860px;
+  font-weight:bold;
+  border-radius:14px;
+}
+
+/* Reusable table/figure utilities */
+.table-scroll,
+.q1-table-scroll{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  margin:16px 0 22px;
+}
+.table-scroll table,
+.q1-table{
+  margin:0;
+}
+.two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  align-items:start;
+}
+.radio-line,
+.checkline{
+  display:flex;
+  gap:18px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.radio-line label,
+.checkline label{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  font-weight:bold;
+}
+.scoring-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin:28px 0;
+}
+.scoring-card h4{text-align:center;margin:0 0 8px}
+.scoring-card table{font-size:.92rem;margin:0}
+.scoring-card input{padding:5px;text-align:center}
+.punnett-wrap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:42px;
+  margin:20px 0;
+}
+.punnett{
+  display:grid;
+  gap:0;
+  margin:12px auto;
+}
+.punnett div{
+  border:1px solid #222;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:3px;
+}
+.punnett .blank{border:0}
+.punnett input{height:34px;text-align:center;padding:3px}
+
+/* Buy Me a Coffee button copied from lab manual */
+.coffee{
+  text-align:center;
+  margin:34px auto 0;
+}
+.coffee img{
+  max-width:230px;
+  width:90%;
+  border-radius:18px;
+  transition:transform .22s ease,filter .22s ease,box-shadow .22s ease;
+}
+.coffee img:hover{
+  transform:translateY(-5px) scale(1.06) rotate(-1.2deg);
+  filter:brightness(1.05) saturate(1.12);
+  box-shadow:0 16px 32px rgba(0,0,0,.28);
+}
+
+/* ==================================================
+   5. PDF EXPORT SUPPORT STYLES
+   ================================================== */
+.continuous-pdf-stage{
+  position:absolute;
+  left:-30000px;
+  top:0;
+  width:var(--worksheet-width) !important;
+  background:#fff;
+  z-index:-1;
+}
+.continuous-pdf-stage .sheet,
+.sheet.single-page-export{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+  margin:0 !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+.pdf-value-field{
+  background:#fbfffb;
+  border:1px solid var(--field-border);
+  border-radius:6px;
+  min-height:30px;
+  line-height:1.25;
+  padding:7px 8px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.pdf-check-field{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  border:1px solid var(--field-border);
+  border-radius:4px;
+  background:#fbfffb;
+  font-family:Arial,sans-serif;
+  font-size:18px;
+  font-weight:bold;
+  line-height:1;
+}
+@media(max-width:850px){
+  body{font-size:18px !important;}
+  .sheet{
+    width:var(--worksheet-width) !important;
+    min-width:var(--worksheet-width) !important;
+    max-width:var(--worksheet-width) !important;
+    padding:28px 38px 42px !important;
+    border-radius:30px !important;
+  }
+  .logo{
+    position:absolute !important;
+    top:10px !important;
+    left:12px !important;
+    width:54px !important;
+    margin:0 !important;
+  }
+  .student-row{
+    display:grid !important;
+    grid-template-columns:auto 1fr auto 150px auto 150px !important;
+  }
+}
+@media print{
+  @page{size:auto;margin:0;}
+  body{background:#fff;}
+  .toolbar{display:none !important;}
+  .sheet{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+}
+
+/* ==================================================
+   LAB 3 ASSIGNMENT-SPECIFIC STYLES
+   Preserved from Lab 3 content. These support cross diagrams,
+   model cards, Punnett squares, scoring tables, and the forked-line workspace.
+   ================================================== */
+.cross-row{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:44px;
+  margin:18px auto;
+  flex-wrap:wrap;
+  text-align:center;
+}
+.cross-row img{
+  width:230px;
+  height:165px;
+  object-fit:contain;
+  border:2px solid #9bce8e;
+  background:#f7fbf5;
+}
+.cross-symbol{
+  font-weight:bold;
+  font-size:2.2rem;
+}
+.checkline{
+  display:flex;
+  gap:28px;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  margin:10px 0 16px;
+}
+.checkline label, .checkbox-grid label{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  font-weight:bold;
+}
+input[type="checkbox"]{
+  width:22px;
+  height:22px;
+  accent-color:#3c7b35;
+}
+.model-card{
+  border:1px solid #b7d7ad;
+  border-radius:14px;
+  padding:14px 18px;
+  margin:18px 0;
+  background:linear-gradient(180deg,#ffffff,#fbfffa);
+}
+.model-card h3{
+  margin:0 0 12px;
+  font-size:1.1rem;
+  text-decoration:underline;
+}
+.model-row{
+  display:grid;
+  grid-template-columns:1.2fr .8fr .8fr;
+  gap:12px;
+  align-items:center;
+  margin:10px 0;
+}
+.punnett{
+  display:grid;
+  grid-template-columns:90px repeat(4,1fr);
+  grid-template-rows:40px repeat(4,54px);
+  gap:0;
+  max-width:760px;
+  margin:12px auto;
+}
+.punnett.small{
+  grid-template-columns:90px repeat(2,1fr);
+  grid-template-rows:40px repeat(2,54px);
+  max-width:430px;
+}
+.punnett div{
+  border:1px solid #222;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:3px;
+}
+.punnett .blank{border:0}
+.punnett input{height:34px;text-align:center;padding:3px}
+.scoring-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin:22px 0;
+}
+.scoring-card h4{text-align:center;margin:0 0 8px}
+.scoring-card table{font-size:.86rem;margin:0}
+.scoring-card input{padding:5px;text-align:center; min-width:0;}
+.question-note{text-align:center;margin:16px 0}
+.final-note{
+  margin:40px auto 0;
+  text-align:center;
+  background:#f2f2f2;
+  padding:16px;
+  max-width:860px;
+  font-weight:bold;
+}
+.two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  align-items:start;
+}
+.long-answer{min-height:170px}
+.huge-answer{min-height:260px}
+
+
+td input[type="checkbox"]{ margin:auto; display:block; }
+table tbody tr td input{ min-width:0; }
+
+
+
+/* Q3 forked-line method workspace - page-fit connected version */
+.fork-wrap{
+  width:100%;
+  overflow-x:auto;
+  padding:10px 0 4px;
+}
+.fork-board{
+  width:980px;
+  min-width:980px;
+  max-width:980px;
+  border:1px solid #333;
+  background:#fff;
+  display:grid;
+  grid-template-columns:135px 145px 145px 145px 125px 285px;
+  grid-template-rows:64px repeat(16, 44px);
+  position:relative;
+  margin:12px 0 22px;
+}
+.fork-head{
+  border-right:1px solid #333;
+  border-bottom:1px solid #333;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-weight:bold;
+  padding:5px;
+  line-height:1.05;
+  background:#fff;
+  z-index:3;
+  font-size:.95rem;
+}
+.fork-cell{
+  border-right:1px solid #333;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:3px;
+  z-index:3;
+  background:transparent;
+}
+.fork-cell.final{
+  justify-content:center;
+}
+.fork-box{
+  height:30px;
+  padding:2px 5px;
+  text-align:center;
+  font-size:.9rem;
+  background:white;
+}
+.fork-trait{
+  width:98px !important;
+  min-width:98px !important;
+  max-width:98px !important;
+}
+.fork-prop{
+  width:94px !important;
+  min-width:94px !important;
+  max-width:94px !important;
+}
+.fork-pheno{
+  width:252px !important;
+  min-width:252px !important;
+  max-width:252px !important;
+}
+.fork-lines{
+  position:absolute;
+  left:0;
+  top:64px;
+  width:100%;
+  height:704px;
+  z-index:1;
+  pointer-events:none;
+}
+.fork-lines line{
+  stroke:#4f8d3d;
+  stroke-width:2.2;
+}
+.fork-lines marker path{
+  fill:#4f8d3d;
+}
+.fork-note{
+  font-size:.92rem;
+  text-align:center;
+  margin:6px 0 0;
+}
+@media(max-width:850px){
+  .fork-board{min-width:980px}
+}
+
+
+@media(max-width:850px){
+  .fork-board{min-width:980px}
+}
+
+
+
+/* ==================================================
+   LAB 3 Q3 PDF EXPORT STABILIZATION
+   Export-only rules: keep the forked-line board, SVG overlay, and value boxes
+   aligned when html2canvas renders the PDF clone.
+   ================================================== */
+.continuous-pdf-stage .fork-wrap-pdf-stable{
+  overflow:visible !important;
+  width:100% !important;
+  padding:10px 0 4px !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable{
+  width:980px !important;
+  min-width:980px !important;
+  max-width:980px !important;
+  height:768px !important;
+  min-height:768px !important;
+  max-height:768px !important;
+  overflow:visible !important;
+  transform:none !important;
+  display:grid !important;
+  grid-template-columns:135px 145px 145px 145px 125px 285px !important;
+  grid-template-rows:64px repeat(16, 44px) !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable .fork-lines{
+  position:absolute !important;
+  left:0 !important;
+  top:64px !important;
+  width:980px !important;
+  height:704px !important;
+  overflow:visible !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable .fork-cell{
+  min-height:44px !important;
+  height:44px !important;
+  padding:3px !important;
+  overflow:visible !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable .fork-box.pdf-value-field{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:30px !important;
+  min-height:30px !important;
+  padding:2px 5px !important;
+  font-size:.9rem !important;
+  line-height:1.1 !important;
+  box-sizing:border-box !important;
+  white-space:pre-wrap !important;
+  overflow:hidden !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable .fork-trait.pdf-value-field{
+  width:98px !important;
+  min-width:98px !important;
+  max-width:98px !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable .fork-prop.pdf-value-field{
+  width:94px !important;
+  min-width:94px !important;
+  max-width:94px !important;
+}
+.continuous-pdf-stage #q3ForkBoard.fork-board-pdf-stable .fork-pheno.pdf-value-field{
+  width:252px !important;
+  min-width:252px !important;
+  max-width:252px !important;
+}
+
+</style>
+</head>
+
+<body data-lab="3">
+<!-- ==================================================
+     6. TOOLBAR MARKUP
+     ================================================== -->
+<div class="toolbar">
+  <strong>BIOL 226 Assignment #3</strong>
+  <button onclick="saveProgress()">Save Progress</button>
+  <button onclick="loadProgress()">Load Progress</button>
+  <button onclick="clearProgress()">Clear Form</button>
+  <button onclick="exportPDFv1()">Export PDF</button>
+  <span id="exportStatus" style="font-size:.9rem;opacity:.9;"></span>
+</div>
+
+<!-- ==================================================
+     7. WORKSHEET / HEADER
+     ================================================== -->
+<form id="labForm" class="sheet">
+  <header class="header">
+    <!-- Replace the logo src if the assignment uses a different embedded image. -->
+    <img class="logo" src="data:image/png;base64,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" alt="Drosophila icon">
+    <h1>ASSIGNMENT # 3</h1>
+    <div class="subtitle">Deadline: Return at the end of the laboratory session</div>
+    <div class="option-line"><b>Option 1:</b> Deposit a physical copy in the cart (front of the lab)</div>
+    <div class="option-line"><b>Option 2:</b> Submit an <u>electronic copy</u> (i.e., PDF file) through the LMS platform (Canvas)</div>
+    <div class="student-row">
+      <b>Name:</b><input name="student_name">
+      <b>Student #:</b><input name="student_number">
+      <b>Date:</b><input name="date">
+    </div>
+  </header>
+
+  <!-- ==================================================
+       8. ASSIGNMENT CONTENT STARTS HERE
+       Lab 3 educational content migrated from the original Lab 3 file.
+       Do not modify framework code unless updating the BIOL 226 template.
+       ================================================== -->
+
+
+  <span class="section-title">IN-PERSON LABORATORY WORK AND IDENTIFICATION OF PHENOTYPES<br>WORTH 30% OF ASSIGNMENT GRADE (Q#1-3)</span>
+
+  <p class="instructions"><b>1.</b> After observing the <b><u>F1 parental flies (F1 × F1)</u></b> under the dissecting scope, please summarize the obtained data in the table below. Please double check the phenotypes with your TA. <b>y</b>=yellow, <b>w</b>=white, <b>m</b>=miniature, <b>se</b>=sepia, <b>WT</b>= wild-type</p>
+
+  <table class="data-table">
+    <thead>
+      <tr><th></th><th colspan="3">Males</th><th colspan="3">Females</th><th>Total</th></tr>
+      <tr><th></th><th>y-w-m</th><th>se</th><th>WT</th><th>y-w-m</th><th>se</th><th>WT</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>Total</th>
+        <td><input type="text" name="q1_male_ywm"></td><td><input type="text" name="q1_male_se"></td><td><input type="text" name="q1_male_wt"></td>
+        <td><input type="text" name="q1_female_ywm"></td><td><input type="text" name="q1_female_se"></td><td><input type="text" name="q1_female_wt"></td>
+        <td><input type="text" name="q1_total"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="hint"><b>*To get full marks, please record your data in the file available online through the modules tab in Canvas (Lab # 3)*</b></div>
+
+  <span class="section-title">PREDICTIONS USING A MODEL: THE SECOND GENERATION (F<sub>2</sub>)</span>
+  <p>You already proposed a genetics model of inheritance for the yellow, white, miniature, and sepia mutations (pages 29-31). Using this information, please answer the following questions.</p>
+
+  <p class="instructions"><b>2.</b> Please provide the genotype and phenotype of the F1 flies.</p>
+  <p><b>F1 genotype(s):</b> <input type="text" name="q2_f1_genotypes"></p>
+  <p><b>F1 phenotype(s):</b> <input type="text" name="q2_f1_phenotypes"></p>
+
+  <p class="instructions"><b>3.</b> Please use the following template to draw a Forked-lined method to estimate the expected <b><u>phenotypic frequencies</u></b> of the F2 offspring.</p>
+  <div class="hint"><b>Important information:</b> 1) Please do not consider the sex of the flies, only the phenotypes. 2) When both, white and sepia mutations are present (w/w ; se/se), the resulting flies will show white eyes. This is due to an epistatic interaction that will be studied in further labs.</div>
+  <div class="fork-wrap"><div class="fork-board" id="q3ForkBoard">
+<div class="fork-head" style="grid-column:1;grid-row:1;">Body color<br>(yellow – wt)</div>
+<div class="fork-head" style="grid-column:2;grid-row:1;">Eye color<br>(white – wt)</div>
+<div class="fork-head" style="grid-column:3;grid-row:1;">Wing size<br>(miniature – wt)</div>
+<div class="fork-head" style="grid-column:4;grid-row:1;">Eye color<br>(sepia – wt)</div>
+<div class="fork-head" style="grid-column:5;grid-row:1;">Proportion<br>(As a fraction)</div>
+<div class="fork-head" style="grid-column:6;grid-row:1;">Phenotype</div>
+<svg class="fork-lines" viewBox="0 0 980 704" preserveAspectRatio="none">
+<defs><marker id="forkArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,4 L0,8 Z"></path></marker></defs>
+<line x1="116.5" y1="198.0" x2="158.5" y2="110.0"></line>
+<line x1="116.5" y1="198.0" x2="158.5" y2="286.0"></line>
+<line x1="116.5" y1="550.0" x2="158.5" y2="462.0"></line>
+<line x1="116.5" y1="550.0" x2="158.5" y2="638.0"></line>
+<line x1="256.5" y1="110.0" x2="303.5" y2="66.0"></line>
+<line x1="256.5" y1="110.0" x2="303.5" y2="154.0"></line>
+<line x1="256.5" y1="286.0" x2="303.5" y2="242.0"></line>
+<line x1="256.5" y1="286.0" x2="303.5" y2="330.0"></line>
+<line x1="256.5" y1="462.0" x2="303.5" y2="418.0"></line>
+<line x1="256.5" y1="462.0" x2="303.5" y2="506.0"></line>
+<line x1="256.5" y1="638.0" x2="303.5" y2="594.0"></line>
+<line x1="256.5" y1="638.0" x2="303.5" y2="682.0"></line>
+<line x1="401.5" y1="66.0" x2="448.5" y2="22.0"></line>
+<line x1="401.5" y1="66.0" x2="448.5" y2="66.0"></line>
+<line x1="401.5" y1="154.0" x2="448.5" y2="110.0"></line>
+<line x1="401.5" y1="154.0" x2="448.5" y2="154.0"></line>
+<line x1="401.5" y1="242.0" x2="448.5" y2="198.0"></line>
+<line x1="401.5" y1="242.0" x2="448.5" y2="242.0"></line>
+<line x1="401.5" y1="330.0" x2="448.5" y2="286.0"></line>
+<line x1="401.5" y1="330.0" x2="448.5" y2="330.0"></line>
+<line x1="401.5" y1="418.0" x2="448.5" y2="374.0"></line>
+<line x1="401.5" y1="418.0" x2="448.5" y2="418.0"></line>
+<line x1="401.5" y1="506.0" x2="448.5" y2="462.0"></line>
+<line x1="401.5" y1="506.0" x2="448.5" y2="506.0"></line>
+<line x1="401.5" y1="594.0" x2="448.5" y2="550.0"></line>
+<line x1="401.5" y1="594.0" x2="448.5" y2="594.0"></line>
+<line x1="401.5" y1="682.0" x2="448.5" y2="638.0"></line>
+<line x1="401.5" y1="682.0" x2="448.5" y2="682.0"></line>
+<line x1="546.5" y1="22.0" x2="585.5" y2="22.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="22.0" x2="711.5" y2="22.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="66.0" x2="585.5" y2="66.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="66.0" x2="711.5" y2="66.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="110.0" x2="585.5" y2="110.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="110.0" x2="711.5" y2="110.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="154.0" x2="585.5" y2="154.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="154.0" x2="711.5" y2="154.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="198.0" x2="585.5" y2="198.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="198.0" x2="711.5" y2="198.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="242.0" x2="585.5" y2="242.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="242.0" x2="711.5" y2="242.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="286.0" x2="585.5" y2="286.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="286.0" x2="711.5" y2="286.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="330.0" x2="585.5" y2="330.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="330.0" x2="711.5" y2="330.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="374.0" x2="585.5" y2="374.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="374.0" x2="711.5" y2="374.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="418.0" x2="585.5" y2="418.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="418.0" x2="711.5" y2="418.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="462.0" x2="585.5" y2="462.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="462.0" x2="711.5" y2="462.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="506.0" x2="585.5" y2="506.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="506.0" x2="711.5" y2="506.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="550.0" x2="585.5" y2="550.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="550.0" x2="711.5" y2="550.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="594.0" x2="585.5" y2="594.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="594.0" x2="711.5" y2="594.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="638.0" x2="585.5" y2="638.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="638.0" x2="711.5" y2="638.0" marker-end="url(#forkArrow)"></line>
+<line x1="546.5" y1="682.0" x2="585.5" y2="682.0" marker-end="url(#forkArrow)"></line>
+<line x1="679.5" y1="682.0" x2="711.5" y2="682.0" marker-end="url(#forkArrow)"></line>
+</svg>
+<div class="fork-cell" style="grid-column:1;grid-row:6;"><input class="fork-box fork-trait" name="q3_body_1"></div>
+<div class="fork-cell" style="grid-column:1;grid-row:14;"><input class="fork-box fork-trait" name="q3_body_2"></div>
+<div class="fork-cell" style="grid-column:2;grid-row:4;"><input class="fork-box fork-trait" name="q3_white_1"></div>
+<div class="fork-cell" style="grid-column:2;grid-row:8;"><input class="fork-box fork-trait" name="q3_white_2"></div>
+<div class="fork-cell" style="grid-column:2;grid-row:12;"><input class="fork-box fork-trait" name="q3_white_3"></div>
+<div class="fork-cell" style="grid-column:2;grid-row:16;"><input class="fork-box fork-trait" name="q3_white_4"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:3;"><input class="fork-box fork-trait" name="q3_wing_1"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:5;"><input class="fork-box fork-trait" name="q3_wing_2"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:7;"><input class="fork-box fork-trait" name="q3_wing_3"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:9;"><input class="fork-box fork-trait" name="q3_wing_4"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:11;"><input class="fork-box fork-trait" name="q3_wing_5"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:13;"><input class="fork-box fork-trait" name="q3_wing_6"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:15;"><input class="fork-box fork-trait" name="q3_wing_7"></div>
+<div class="fork-cell" style="grid-column:3;grid-row:17;"><input class="fork-box fork-trait" name="q3_wing_8"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:2;"><input class="fork-box fork-trait" name="q3_sepia_1"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:3;"><input class="fork-box fork-trait" name="q3_sepia_2"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:4;"><input class="fork-box fork-trait" name="q3_sepia_3"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:5;"><input class="fork-box fork-trait" name="q3_sepia_4"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:6;"><input class="fork-box fork-trait" name="q3_sepia_5"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:7;"><input class="fork-box fork-trait" name="q3_sepia_6"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:8;"><input class="fork-box fork-trait" name="q3_sepia_7"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:9;"><input class="fork-box fork-trait" name="q3_sepia_8"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:10;"><input class="fork-box fork-trait" name="q3_sepia_9"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:11;"><input class="fork-box fork-trait" name="q3_sepia_10"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:12;"><input class="fork-box fork-trait" name="q3_sepia_11"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:13;"><input class="fork-box fork-trait" name="q3_sepia_12"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:14;"><input class="fork-box fork-trait" name="q3_sepia_13"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:15;"><input class="fork-box fork-trait" name="q3_sepia_14"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:16;"><input class="fork-box fork-trait" name="q3_sepia_15"></div>
+<div class="fork-cell" style="grid-column:4;grid-row:17;"><input class="fork-box fork-trait" name="q3_sepia_16"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:2;"><input class="fork-box fork-prop" name="q3_proportion_1"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:3;"><input class="fork-box fork-prop" name="q3_proportion_2"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:4;"><input class="fork-box fork-prop" name="q3_proportion_3"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:5;"><input class="fork-box fork-prop" name="q3_proportion_4"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:6;"><input class="fork-box fork-prop" name="q3_proportion_5"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:7;"><input class="fork-box fork-prop" name="q3_proportion_6"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:8;"><input class="fork-box fork-prop" name="q3_proportion_7"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:9;"><input class="fork-box fork-prop" name="q3_proportion_8"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:10;"><input class="fork-box fork-prop" name="q3_proportion_9"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:11;"><input class="fork-box fork-prop" name="q3_proportion_10"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:12;"><input class="fork-box fork-prop" name="q3_proportion_11"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:13;"><input class="fork-box fork-prop" name="q3_proportion_12"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:14;"><input class="fork-box fork-prop" name="q3_proportion_13"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:15;"><input class="fork-box fork-prop" name="q3_proportion_14"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:16;"><input class="fork-box fork-prop" name="q3_proportion_15"></div>
+<div class="fork-cell" style="grid-column:5;grid-row:17;"><input class="fork-box fork-prop" name="q3_proportion_16"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:2;"><input class="fork-box fork-pheno" name="q3_phenotype_1"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:3;"><input class="fork-box fork-pheno" name="q3_phenotype_2"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:4;"><input class="fork-box fork-pheno" name="q3_phenotype_3"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:5;"><input class="fork-box fork-pheno" name="q3_phenotype_4"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:6;"><input class="fork-box fork-pheno" name="q3_phenotype_5"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:7;"><input class="fork-box fork-pheno" name="q3_phenotype_6"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:8;"><input class="fork-box fork-pheno" name="q3_phenotype_7"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:9;"><input class="fork-box fork-pheno" name="q3_phenotype_8"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:10;"><input class="fork-box fork-pheno" name="q3_phenotype_9"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:11;"><input class="fork-box fork-pheno" name="q3_phenotype_10"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:12;"><input class="fork-box fork-pheno" name="q3_phenotype_11"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:13;"><input class="fork-box fork-pheno" name="q3_phenotype_12"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:14;"><input class="fork-box fork-pheno" name="q3_phenotype_13"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:15;"><input class="fork-box fork-pheno" name="q3_phenotype_14"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:16;"><input class="fork-box fork-pheno" name="q3_phenotype_15"></div>
+<div class="fork-cell" style="grid-column:6;grid-row:17;"><input class="fork-box fork-pheno" name="q3_phenotype_16"></div>
+</div></div>
+<div class="fork-note"><b>Tip:</b> Fill each branch box, then complete the final proportion and phenotype boxes on the right.</div>
+
+  <div class="page-break"></div>
+  <span class="section-title">GENETICS VIRTUAL LAB</span>
+  <div class="hint">For the next set of questions, you will use the <b>“Sex-Linked Inheritance Analyzer”</b> tool available online (<a href="https://www.ampossot.com/sex" target="_blank">www.ampossot.com/sex</a>).</div>
+  <p><i>*All crosses performed at the Virtual Lab correspond to hypothetical simulated and randomized data. The actual genetics basis of the genes/traits in nature may be different*.</i></p>
+  <p>To describe the phenotypes, <b><u>reduce the ratio to its lowest terms</u></b> (Ex., 3.1:1).</p>
+  <p>Based on the simulation of several crosses, you need to determine the genetics model of two traits (i.e., Dominant vs. Recessive; Autosomal vs. Sex-linked). Perform the following crosses using the virtual tool and fill the tables with the required information.</p>
+  <div class="hint"><b>Hint:</b> When you are studying a cross that includes several traits, start your analysis with <b><u>one trait at a time</u></b>. For example, start by crossing two flies with the same wing shape without considering the body color.</div>
+
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>4.</b> Eye color: perform <b><u>three</u></b> independent crosses between a <b><u>wild-type female</u></b> and a <b><u>wild-type male</u></b>. Record the data in the scoring tables. The number of obtained flies is available in the “analysis” tab of each corresponding vial.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q4_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q4_v1_sepia_wt_f"></td><td><input type="text" name="q4_v1_sepia_wt_m"></td><td><input type="text" name="q4_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q4_v1_sepia_yellow_f"></td><td><input type="text" name="q4_v1_sepia_yellow_m"></td><td><input type="text" name="q4_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q4_v1_wt_wt_f"></td><td><input type="text" name="q4_v1_wt_wt_m"></td><td><input type="text" name="q4_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q4_v1_wt_yellow_f"></td><td><input type="text" name="q4_v1_wt_yellow_m"></td><td><input type="text" name="q4_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q4_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q4_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q4_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q4_v2_sepia_wt_f"></td><td><input type="text" name="q4_v2_sepia_wt_m"></td><td><input type="text" name="q4_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q4_v2_sepia_yellow_f"></td><td><input type="text" name="q4_v2_sepia_yellow_m"></td><td><input type="text" name="q4_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q4_v2_wt_wt_f"></td><td><input type="text" name="q4_v2_wt_wt_m"></td><td><input type="text" name="q4_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q4_v2_wt_yellow_f"></td><td><input type="text" name="q4_v2_wt_yellow_m"></td><td><input type="text" name="q4_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q4_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q4_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q4_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q4_v3_sepia_wt_f"></td><td><input type="text" name="q4_v3_sepia_wt_m"></td><td><input type="text" name="q4_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q4_v3_sepia_yellow_f"></td><td><input type="text" name="q4_v3_sepia_yellow_m"></td><td><input type="text" name="q4_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q4_v3_wt_wt_f"></td><td><input type="text" name="q4_v3_wt_wt_m"></td><td><input type="text" name="q4_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q4_v3_wt_yellow_f"></td><td><input type="text" name="q4_v3_wt_yellow_m"></td><td><input type="text" name="q4_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q4_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q4_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q4_sex_bias" class="small-field">
+        <br>For example: All males sepia (none wild-type); All females wild-type (none sepia)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>5.</b> Eye color: perform <b><u>three</u></b> independent crosses between a <b><u>wild-type female</u></b> and a <b><u>sepia-eyed male</u></b>. Record the data in the scoring tables. Make sure that you use different parental flies each time you perform a cross.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q5_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q5_v1_sepia_wt_f"></td><td><input type="text" name="q5_v1_sepia_wt_m"></td><td><input type="text" name="q5_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q5_v1_sepia_yellow_f"></td><td><input type="text" name="q5_v1_sepia_yellow_m"></td><td><input type="text" name="q5_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q5_v1_wt_wt_f"></td><td><input type="text" name="q5_v1_wt_wt_m"></td><td><input type="text" name="q5_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q5_v1_wt_yellow_f"></td><td><input type="text" name="q5_v1_wt_yellow_m"></td><td><input type="text" name="q5_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q5_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q5_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q5_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q5_v2_sepia_wt_f"></td><td><input type="text" name="q5_v2_sepia_wt_m"></td><td><input type="text" name="q5_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q5_v2_sepia_yellow_f"></td><td><input type="text" name="q5_v2_sepia_yellow_m"></td><td><input type="text" name="q5_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q5_v2_wt_wt_f"></td><td><input type="text" name="q5_v2_wt_wt_m"></td><td><input type="text" name="q5_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q5_v2_wt_yellow_f"></td><td><input type="text" name="q5_v2_wt_yellow_m"></td><td><input type="text" name="q5_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q5_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q5_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q5_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q5_v3_sepia_wt_f"></td><td><input type="text" name="q5_v3_sepia_wt_m"></td><td><input type="text" name="q5_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q5_v3_sepia_yellow_f"></td><td><input type="text" name="q5_v3_sepia_yellow_m"></td><td><input type="text" name="q5_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q5_v3_wt_wt_f"></td><td><input type="text" name="q5_v3_wt_wt_m"></td><td><input type="text" name="q5_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q5_v3_wt_yellow_f"></td><td><input type="text" name="q5_v3_wt_yellow_m"></td><td><input type="text" name="q5_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q5_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q5_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q5_sex_bias" class="small-field">
+        <br>For example: All males sepia (none wild-type); All females wild-type (none sepia)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>6.</b> Eye color: perform <b><u>three</u></b> independent crosses between a <b><u>sepia-eyed female</u></b> and a <b><u>wild-type male</u></b>. Record the data in the scoring tables. Make sure that you use different parental flies each time you perform a cross.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q6_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q6_v1_sepia_wt_f"></td><td><input type="text" name="q6_v1_sepia_wt_m"></td><td><input type="text" name="q6_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q6_v1_sepia_yellow_f"></td><td><input type="text" name="q6_v1_sepia_yellow_m"></td><td><input type="text" name="q6_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q6_v1_wt_wt_f"></td><td><input type="text" name="q6_v1_wt_wt_m"></td><td><input type="text" name="q6_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q6_v1_wt_yellow_f"></td><td><input type="text" name="q6_v1_wt_yellow_m"></td><td><input type="text" name="q6_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q6_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q6_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q6_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q6_v2_sepia_wt_f"></td><td><input type="text" name="q6_v2_sepia_wt_m"></td><td><input type="text" name="q6_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q6_v2_sepia_yellow_f"></td><td><input type="text" name="q6_v2_sepia_yellow_m"></td><td><input type="text" name="q6_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q6_v2_wt_wt_f"></td><td><input type="text" name="q6_v2_wt_wt_m"></td><td><input type="text" name="q6_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q6_v2_wt_yellow_f"></td><td><input type="text" name="q6_v2_wt_yellow_m"></td><td><input type="text" name="q6_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q6_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q6_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q6_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q6_v3_sepia_wt_f"></td><td><input type="text" name="q6_v3_sepia_wt_m"></td><td><input type="text" name="q6_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q6_v3_sepia_yellow_f"></td><td><input type="text" name="q6_v3_sepia_yellow_m"></td><td><input type="text" name="q6_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q6_v3_wt_wt_f"></td><td><input type="text" name="q6_v3_wt_wt_m"></td><td><input type="text" name="q6_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q6_v3_wt_yellow_f"></td><td><input type="text" name="q6_v3_wt_yellow_m"></td><td><input type="text" name="q6_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q6_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q6_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q6_sex_bias" class="small-field">
+        <br>For example: All males sepia (none wild-type); All females wild-type (none sepia)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>7.</b> Eye color: perform <b><u>three</u></b> independent crosses between a <b><u>sepia-eyed female</u></b> and a <b><u>sepia-eyed male</u></b>. Record the data in the scoring tables. Make sure that you use different parental flies each time you perform a cross.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q7_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q7_v1_sepia_wt_f"></td><td><input type="text" name="q7_v1_sepia_wt_m"></td><td><input type="text" name="q7_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q7_v1_sepia_yellow_f"></td><td><input type="text" name="q7_v1_sepia_yellow_m"></td><td><input type="text" name="q7_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q7_v1_wt_wt_f"></td><td><input type="text" name="q7_v1_wt_wt_m"></td><td><input type="text" name="q7_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q7_v1_wt_yellow_f"></td><td><input type="text" name="q7_v1_wt_yellow_m"></td><td><input type="text" name="q7_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q7_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q7_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q7_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q7_v2_sepia_wt_f"></td><td><input type="text" name="q7_v2_sepia_wt_m"></td><td><input type="text" name="q7_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q7_v2_sepia_yellow_f"></td><td><input type="text" name="q7_v2_sepia_yellow_m"></td><td><input type="text" name="q7_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q7_v2_wt_wt_f"></td><td><input type="text" name="q7_v2_wt_wt_m"></td><td><input type="text" name="q7_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q7_v2_wt_yellow_f"></td><td><input type="text" name="q7_v2_wt_yellow_m"></td><td><input type="text" name="q7_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q7_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q7_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q7_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q7_v3_sepia_wt_f"></td><td><input type="text" name="q7_v3_sepia_wt_m"></td><td><input type="text" name="q7_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q7_v3_sepia_yellow_f"></td><td><input type="text" name="q7_v3_sepia_yellow_m"></td><td><input type="text" name="q7_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q7_v3_wt_wt_f"></td><td><input type="text" name="q7_v3_wt_wt_m"></td><td><input type="text" name="q7_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q7_v3_wt_yellow_f"></td><td><input type="text" name="q7_v3_wt_yellow_m"></td><td><input type="text" name="q7_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q7_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q7_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q7_sex_bias" class="small-field">
+        <br>For example: All males sepia (none wild-type); All females wild-type (none sepia)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+
+  <p class="instructions"><b>8.</b> Based on your analysis of the previous nine crosses, propose a genetics mode of inheritance for the eye color trait:</p>
+  
+    <div class="model-card">
+      <h3>Eye color trait</h3>
+      <div class="checkline">Can you determine the mode of inheritance using the collected data:
+        <label>YES: <input type="checkbox" name="q8_yes"></label>
+        <label>NO: <input type="checkbox" name="q8_no"></label>
+      </div>
+      <p>If your answer is “NO”, try re-running the virtual tool until you have data that supports your conclusions.</p>
+      <div class="model-row"><b>Wild-type eye coloration is:</b><label>Dominant: <input type="checkbox" name="q8_trait1_dom"></label><label>Recessive: <input type="checkbox" name="q8_trait1_rec"></label></div>
+      <div class="model-row"><b>Sepia eye coloration is:</b><label>Dominant: <input type="checkbox" name="q8_trait2_dom"></label><label>Recessive: <input type="checkbox" name="q8_trait2_rec"></label></div>
+      <div class="model-row"><b>The eye-color trait is:</b><label>Autosomal: <input type="checkbox" name="q8_auto"></label><label>Sex-linked: <input type="checkbox" name="q8_sexlinked"></label></div>
+    </div>
+
+  <div class="page-break"></div>
+  <p class="instructions">In the next section, you will focus on the analysis of the second trait (Body color).</p>
+
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>9.</b> Body color: perform <b><u>three</u></b> independent crosses between a <b><u>wild-type female</u></b> and a <b><u>wild-type male</u></b>. Record the data in the scoring tables. The number of obtained flies is available in the “analysis” tab of each corresponding vial.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q9_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q9_v1_sepia_wt_f"></td><td><input type="text" name="q9_v1_sepia_wt_m"></td><td><input type="text" name="q9_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q9_v1_sepia_yellow_f"></td><td><input type="text" name="q9_v1_sepia_yellow_m"></td><td><input type="text" name="q9_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q9_v1_wt_wt_f"></td><td><input type="text" name="q9_v1_wt_wt_m"></td><td><input type="text" name="q9_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q9_v1_wt_yellow_f"></td><td><input type="text" name="q9_v1_wt_yellow_m"></td><td><input type="text" name="q9_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q9_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q9_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q9_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q9_v2_sepia_wt_f"></td><td><input type="text" name="q9_v2_sepia_wt_m"></td><td><input type="text" name="q9_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q9_v2_sepia_yellow_f"></td><td><input type="text" name="q9_v2_sepia_yellow_m"></td><td><input type="text" name="q9_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q9_v2_wt_wt_f"></td><td><input type="text" name="q9_v2_wt_wt_m"></td><td><input type="text" name="q9_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q9_v2_wt_yellow_f"></td><td><input type="text" name="q9_v2_wt_yellow_m"></td><td><input type="text" name="q9_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q9_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q9_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q9_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q9_v3_sepia_wt_f"></td><td><input type="text" name="q9_v3_sepia_wt_m"></td><td><input type="text" name="q9_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q9_v3_sepia_yellow_f"></td><td><input type="text" name="q9_v3_sepia_yellow_m"></td><td><input type="text" name="q9_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q9_v3_wt_wt_f"></td><td><input type="text" name="q9_v3_wt_wt_m"></td><td><input type="text" name="q9_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q9_v3_wt_yellow_f"></td><td><input type="text" name="q9_v3_wt_yellow_m"></td><td><input type="text" name="q9_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q9_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q9_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q9_sex_bias" class="small-field">
+        <br>For example: All males yellow (none wild-type); All females wild-type (none yellow)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>10.</b> Body color: perform <b><u>three</u></b> independent crosses between a <b><u>wild-type female</u></b> and a <b><u>yellow-body male</u></b>. Record the data in the scoring tables. Make sure that you use different parental flies each time you perform a cross.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q10_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q10_v1_sepia_wt_f"></td><td><input type="text" name="q10_v1_sepia_wt_m"></td><td><input type="text" name="q10_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q10_v1_sepia_yellow_f"></td><td><input type="text" name="q10_v1_sepia_yellow_m"></td><td><input type="text" name="q10_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q10_v1_wt_wt_f"></td><td><input type="text" name="q10_v1_wt_wt_m"></td><td><input type="text" name="q10_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q10_v1_wt_yellow_f"></td><td><input type="text" name="q10_v1_wt_yellow_m"></td><td><input type="text" name="q10_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q10_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q10_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q10_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q10_v2_sepia_wt_f"></td><td><input type="text" name="q10_v2_sepia_wt_m"></td><td><input type="text" name="q10_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q10_v2_sepia_yellow_f"></td><td><input type="text" name="q10_v2_sepia_yellow_m"></td><td><input type="text" name="q10_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q10_v2_wt_wt_f"></td><td><input type="text" name="q10_v2_wt_wt_m"></td><td><input type="text" name="q10_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q10_v2_wt_yellow_f"></td><td><input type="text" name="q10_v2_wt_yellow_m"></td><td><input type="text" name="q10_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q10_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q10_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q10_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q10_v3_sepia_wt_f"></td><td><input type="text" name="q10_v3_sepia_wt_m"></td><td><input type="text" name="q10_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q10_v3_sepia_yellow_f"></td><td><input type="text" name="q10_v3_sepia_yellow_m"></td><td><input type="text" name="q10_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q10_v3_wt_wt_f"></td><td><input type="text" name="q10_v3_wt_wt_m"></td><td><input type="text" name="q10_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q10_v3_wt_yellow_f"></td><td><input type="text" name="q10_v3_wt_yellow_m"></td><td><input type="text" name="q10_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q10_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q10_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q10_sex_bias" class="small-field">
+        <br>For example: All males yellow (none wild-type); All females wild-type (none yellow)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>11.</b> Body color: perform <b><u>three</u></b> independent crosses between a <b><u>yellow-body female</u></b> and a <b><u>wild-type male</u></b>. Record the data in the scoring tables. Make sure that you use different parental flies each time you perform a cross.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q11_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q11_v1_sepia_wt_f"></td><td><input type="text" name="q11_v1_sepia_wt_m"></td><td><input type="text" name="q11_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q11_v1_sepia_yellow_f"></td><td><input type="text" name="q11_v1_sepia_yellow_m"></td><td><input type="text" name="q11_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q11_v1_wt_wt_f"></td><td><input type="text" name="q11_v1_wt_wt_m"></td><td><input type="text" name="q11_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q11_v1_wt_yellow_f"></td><td><input type="text" name="q11_v1_wt_yellow_m"></td><td><input type="text" name="q11_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q11_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q11_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q11_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q11_v2_sepia_wt_f"></td><td><input type="text" name="q11_v2_sepia_wt_m"></td><td><input type="text" name="q11_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q11_v2_sepia_yellow_f"></td><td><input type="text" name="q11_v2_sepia_yellow_m"></td><td><input type="text" name="q11_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q11_v2_wt_wt_f"></td><td><input type="text" name="q11_v2_wt_wt_m"></td><td><input type="text" name="q11_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q11_v2_wt_yellow_f"></td><td><input type="text" name="q11_v2_wt_yellow_m"></td><td><input type="text" name="q11_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q11_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q11_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q11_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q11_v3_sepia_wt_f"></td><td><input type="text" name="q11_v3_sepia_wt_m"></td><td><input type="text" name="q11_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q11_v3_sepia_yellow_f"></td><td><input type="text" name="q11_v3_sepia_yellow_m"></td><td><input type="text" name="q11_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q11_v3_wt_wt_f"></td><td><input type="text" name="q11_v3_wt_wt_m"></td><td><input type="text" name="q11_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q11_v3_wt_yellow_f"></td><td><input type="text" name="q11_v3_wt_yellow_m"></td><td><input type="text" name="q11_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q11_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q11_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q11_sex_bias" class="small-field">
+        <br>For example: All males yellow (none wild-type); All females wild-type (none yellow)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+  
+    <section class="virtual-question-section">
+      <p class="instructions"><b>12.</b> Body color: perform <b><u>three</u></b> independent crosses between a <b><u>yellow-body female</u></b> and a <b><u>yellow-body male</u></b>. Record the data in the scoring tables. Make sure that you use different parental flies each time you perform a cross.</p>
+      <div class="scoring-grid">
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q12_vial1_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q12_v1_sepia_wt_f"></td><td><input type="text" name="q12_v1_sepia_wt_m"></td><td><input type="text" name="q12_v1_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q12_v1_sepia_yellow_f"></td><td><input type="text" name="q12_v1_sepia_yellow_m"></td><td><input type="text" name="q12_v1_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q12_v1_wt_wt_f"></td><td><input type="text" name="q12_v1_wt_wt_m"></td><td><input type="text" name="q12_v1_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q12_v1_wt_yellow_f"></td><td><input type="text" name="q12_v1_wt_yellow_m"></td><td><input type="text" name="q12_v1_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q12_v1_ratio_wt"></td><td colspan="3"><input type="text" name="q12_v1_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q12_vial2_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q12_v2_sepia_wt_f"></td><td><input type="text" name="q12_v2_sepia_wt_m"></td><td><input type="text" name="q12_v2_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q12_v2_sepia_yellow_f"></td><td><input type="text" name="q12_v2_sepia_yellow_m"></td><td><input type="text" name="q12_v2_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q12_v2_wt_wt_f"></td><td><input type="text" name="q12_v2_wt_wt_m"></td><td><input type="text" name="q12_v2_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q12_v2_wt_yellow_f"></td><td><input type="text" name="q12_v2_wt_yellow_m"></td><td><input type="text" name="q12_v2_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q12_v2_ratio_wt"></td><td colspan="3"><input type="text" name="q12_v2_ratio_mut"></td></tr>
+      </table>
+    </div>
+        
+    <div class="scoring-card">
+      <h4>Scoring Table. Vial #: <input type="text" name="q12_vial3_number" class="small-field"></h4>
+      <table>
+        <tr><th>Eye color</th><th>Body<br>color</th><th>F</th><th>M</th><th>Total</th></tr>
+        <tr><td>Sepia</td><td>Wild type</td><td><input type="text" name="q12_v3_sepia_wt_f"></td><td><input type="text" name="q12_v3_sepia_wt_m"></td><td><input type="text" name="q12_v3_sepia_wt_total"></td></tr><tr><td>Sepia</td><td>Yellow</td><td><input type="text" name="q12_v3_sepia_yellow_f"></td><td><input type="text" name="q12_v3_sepia_yellow_m"></td><td><input type="text" name="q12_v3_sepia_yellow_total"></td></tr><tr><td>Wild type</td><td>Wild type</td><td><input type="text" name="q12_v3_wt_wt_f"></td><td><input type="text" name="q12_v3_wt_wt_m"></td><td><input type="text" name="q12_v3_wt_wt_total"></td></tr><tr><td>Wild type</td><td>Yellow</td><td><input type="text" name="q12_v3_wt_yellow_f"></td><td><input type="text" name="q12_v3_wt_yellow_m"></td><td><input type="text" name="q12_v3_wt_yellow_total"></td></tr>
+        <tr><th colspan="5">Phenotypic Ratio</th></tr>
+        <tr><th colspan="2">Wild Type:</th><th colspan="3">Sepia:</th></tr>
+        <tr><td colspan="2"><input type="text" name="q12_v3_ratio_wt"></td><td colspan="3"><input type="text" name="q12_v3_ratio_mut"></td></tr>
+      </table>
+    </div>
+      </div>
+      <div class="question-note">
+        Is there any <b><u>major difference (i.e., bias)</u></b> between the phenotype numbers of male vs. female flies?
+        <input type="text" name="q12_sex_bias" class="small-field">
+        <br>For example: All males yellow (none wild-type); All females wild-type (none yellow)<br>
+        <b>*This may be considered evidence of the presence of sex-linkage*</b>
+      </div>
+    </section>
+
+  <p class="instructions"><b>13.</b> Based on your analysis of the previous nine crosses, propose a genetics mode of inheritance for the body color trait:</p>
+  
+    <div class="model-card">
+      <h3>Body color trait</h3>
+      <div class="checkline">Can you determine the mode of inheritance using the collected data:
+        <label>YES: <input type="checkbox" name="q13_yes"></label>
+        <label>NO: <input type="checkbox" name="q13_no"></label>
+      </div>
+      <p>If your answer is “NO”, try re-running the virtual tool until you have data that supports your conclusions.</p>
+      <div class="model-row"><b>Wild-type body color is:</b><label>Dominant: <input type="checkbox" name="q13_trait1_dom"></label><label>Recessive: <input type="checkbox" name="q13_trait1_rec"></label></div>
+      <div class="model-row"><b>Yellow body color is:</b><label>Dominant: <input type="checkbox" name="q13_trait2_dom"></label><label>Recessive: <input type="checkbox" name="q13_trait2_rec"></label></div>
+      <div class="model-row"><b>The Body-color trait is:</b><label>Autosomal: <input type="checkbox" name="q13_auto"></label><label>Sex-linked: <input type="checkbox" name="q13_sexlinked"></label></div>
+    </div>
+
+  <div class="page-break"></div>
+  <span class="section-title">GENETICS PROBLEM: IMPROVE YOUR SOLVING SKILLS</span>
+  <p>Please consider the following information to solve the next genetics problem</p>
+  <div class="model-card">
+    <p>A scientist performed a cross between a P1 yellow-body and brown-eyed female and a P2 wild-type male, both were pure lines (i.e. homozygous). Also, it is known that both genes are located on different chromosomes.</p>
+    <p>The cross produced the following offspring:</p>
+    <p><b>100% females:</b> Wild type (body and eyes)<br><b>100% males:</b> yellow body, wild-type eyes</p>
+  </div>
+
+  <p class="instructions"><b>14.</b> Based on the F1 results, are the alleles for yellow body and brown eyes dominant or recessive? Are those genes autosomal or sex-linked? Use the table below to fill the right cell with an “X”.</p>
+  <table>
+    <thead><tr><th>Mutation</th><th>Dominant</th><th>Recessive</th><th>Autosomal</th><th>Sex-linked</th></tr></thead>
+    <tbody>
+      <tr><th>Yellow<br>body</th><td><input type="checkbox" name="q14_yellow_dom"></td><td><input type="checkbox" name="q14_yellow_rec"></td><td><input type="checkbox" name="q14_yellow_auto"></td><td><input type="checkbox" name="q14_yellow_sex"></td></tr>
+      <tr><th>Brown<br>eyes</th><td><input type="checkbox" name="q14_brown_dom"></td><td><input type="checkbox" name="q14_brown_rec"></td><td><input type="checkbox" name="q14_brown_auto"></td><td><input type="checkbox" name="q14_brown_sex"></td></tr>
+    </tbody>
+  </table>
+
+  <p class="instructions"><b>15.</b> Based on the notation used in <i>Drosophila</i> research, please provide the genotype of the P1 yellow body and brown-eyed female and P2 wild-type male (both are homozygous).</p>
+  <div class="hint"><b>Hint:</b> For the notation, please consider the following information: females carry the yellow body (y) and the brown (bw) mutations. The males carry the wild-type allele for both genes (y+ and bw+)</div>
+  <p><b>P1 yellow body, brown-eyed females:</b> <input type="text" name="q15_p1"></p>
+  <p><b>P2 wild-type males:</b> <input type="text" name="q15_p2"></p>
+
+  <p class="instructions"><b>16.</b> Please provide the expected phenotype and genotype of the F1 flies. Show your work.</p>
+  <div class="punnett small"><div class="blank">Gametes</div><div><input type="text" name="q16_top1"></div><div><input type="text" name="q16_top2"></div><div><input type="text" name="q16_side1"></div><div><input type="text" name="q16_cell1_1"></div><div><input type="text" name="q16_cell1_2"></div><div><input type="text" name="q16_side2"></div><div><input type="text" name="q16_cell2_1"></div><div><input type="text" name="q16_cell2_2"></div></div>
+  <p><b>F1 genotype(s):</b> <input type="text" name="q16_f1_genotypes"></p>
+  <p><b>F1 phenotype(s):</b> <input type="text" name="q16_f1_phenotypes"></p>
+
+  <p class="instructions"><b>17.</b> What are the expected F2 phenotypic proportions (Ex. ¾ ; ¼) expected by crossing the F1 males and females? Please provide the F1 genotypes and show your work in the Punnett square template. Reduce the proportions to the lowest terms (Ex. 2/4 should be expressed as ½)</p>
+  <p><b>F1 females:</b> <input type="text" name="q17_f1_females" class="medium-field"> <b>X</b> <b>F1 males:</b> <input type="text" name="q17_f1_males" class="medium-field"></p>
+  <div class="punnett"><div class="blank">Gametes</div><div><input type="text" name="q17_top1"></div><div><input type="text" name="q17_top2"></div><div><input type="text" name="q17_top3"></div><div><input type="text" name="q17_top4"></div><div><input type="text" name="q17_side1"></div><div><input type="text" name="q17_cell1_1"></div><div><input type="text" name="q17_cell1_2"></div><div><input type="text" name="q17_cell1_3"></div><div><input type="text" name="q17_cell1_4"></div><div><input type="text" name="q17_side2"></div><div><input type="text" name="q17_cell2_1"></div><div><input type="text" name="q17_cell2_2"></div><div><input type="text" name="q17_cell2_3"></div><div><input type="text" name="q17_cell2_4"></div><div><input type="text" name="q17_side3"></div><div><input type="text" name="q17_cell3_1"></div><div><input type="text" name="q17_cell3_2"></div><div><input type="text" name="q17_cell3_3"></div><div><input type="text" name="q17_cell3_4"></div><div><input type="text" name="q17_side4"></div><div><input type="text" name="q17_cell4_1"></div><div><input type="text" name="q17_cell4_2"></div><div><input type="text" name="q17_cell4_3"></div><div><input type="text" name="q17_cell4_4"></div></div>
+  <p><b>Proportions:</b></p>
+  <textarea name="q17_proportions" class="long-answer"></textarea>
+
+  <div class="final-note">*IMPORTANT NOTE*:<br><br>Return your assignment at the END of the lab session or submit an electronic copy (i.e., scanned PDF file) through CANVAS.</div>
+
+
+<div class="coffee" style="text-align:center; margin-top:30px;">
+  <a href="https://www.buymeacoffee.com/ampossot" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=ampossot&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" />
+  </a>
+</div>
+
+
+  <!-- ==================================================
+       ASSIGNMENT CONTENT ENDS HERE
+       ================================================== -->
+
+  <!-- Optional Buy Me a Coffee section. Insert image/link as desired.
+  <div class="coffee">
+    <a href="#" target="_blank" rel="noopener">
+      <img src="" alt="Buy Me a Coffee">
+    </a>
+  </div>
+  -->
+
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+/* ==================================================
+   9. SAVE / LOAD
+   Generic assignment-independent persistence.
+   ================================================== */
+function getStorageKey(){
+  const lab = document.body.dataset.lab || "X";
+  return `biol226_lab${lab}_fillable_progress`;
+}
+
+function saveProgress(){
+  const form = document.getElementById("labForm");
+  const data = {};
+  form.querySelectorAll("input, textarea, select").forEach((el)=>{
+    if(!el.name) return;
+    if(el.type === "checkbox" || el.type === "radio"){
+      data[el.name] = el.checked;
+    }else{
+      data[el.name] = el.value;
+    }
+  });
+  localStorage.setItem(getStorageKey(), JSON.stringify(data));
+  const status = document.getElementById("exportStatus");
+  if(status) status.textContent = "Progress saved.";
+  setTimeout(()=>{ if(status) status.textContent = ""; }, 2200);
+}
+
+function loadProgress(){
+  const raw = localStorage.getItem(getStorageKey());
+  const status = document.getElementById("exportStatus");
+  if(!raw){
+    if(status) status.textContent = "No saved progress found.";
+    setTimeout(()=>{ if(status) status.textContent = ""; }, 2200);
+    return;
+  }
+  const data = JSON.parse(raw);
+  const form = document.getElementById("labForm");
+  form.querySelectorAll("input, textarea, select").forEach((el)=>{
+    if(!el.name || !(el.name in data)) return;
+    if(el.type === "checkbox" || el.type === "radio"){
+      el.checked = !!data[el.name];
+    }else{
+      el.value = data[el.name];
+    }
+  });
+  autoGrowTextareas();
+  if(status) status.textContent = "Progress loaded.";
+  setTimeout(()=>{ if(status) status.textContent = ""; }, 2200);
+}
+
+function clearProgress(){
+  if(!confirm("Clear all form entries and saved progress for this assignment?")) return;
+  const form = document.getElementById("labForm");
+  form.reset();
+  localStorage.removeItem(getStorageKey());
+  autoGrowTextareas();
+  const status = document.getElementById("exportStatus");
+  if(status) status.textContent = "Form cleared.";
+  setTimeout(()=>{ if(status) status.textContent = ""; }, 2200);
+}
+
+/* ==================================================
+   10. FILENAME GENERATION
+   ================================================== */
+function getExportFilename(){
+  const lab = document.body.dataset.lab || "X";
+  const nameField = document.querySelector('[name="student_name"]');
+  let identifier = nameField ? nameField.value.trim() : "";
+  identifier = identifier
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+    .replace(/\s+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  if(!identifier) identifier = "Student";
+  return `Lab${lab}_BIOL226_${identifier}.pdf`;
+}
+
+/* ==================================================
+   11. HELPER FUNCTIONS
+   ================================================== */
+function autoGrowTextareas(){
+  document.querySelectorAll("textarea").forEach((ta)=>{
+    ta.style.height = "auto";
+    ta.style.height = Math.max(ta.scrollHeight, ta.offsetHeight) + "px";
+  });
+}
+
+function syncFormValues(source, target){
+  const sourceFields = source.querySelectorAll("input, textarea, select");
+  const targetFields = target.querySelectorAll("input, textarea, select");
+  sourceFields.forEach((src, i)=>{
+    const dst = targetFields[i];
+    if(!dst) return;
+    if(src.type === "checkbox" || src.type === "radio"){
+      dst.checked = src.checked;
+    }else{
+      dst.value = src.value;
+    }
+  });
+}
+
+function replaceFieldsForPdf(root){
+  root.querySelectorAll("input, textarea, select").forEach((field)=>{
+    if(field.type === "hidden") return;
+
+    const originalClasses = field.className ? String(field.className).trim() : "";
+
+    if(field.type === "checkbox" || field.type === "radio"){
+      const box = document.createElement("span");
+      box.className = (originalClasses ? originalClasses + " " : "") + "pdf-check-field";
+      box.textContent = field.checked ? "✓" : "";
+      field.replaceWith(box);
+      return;
+    }
+
+    const isTextarea = field.tagName.toLowerCase() === "textarea";
+    const isForkBox = field.classList.contains("fork-box");
+    const valueBox = document.createElement(isTextarea ? "div" : "span");
+
+    valueBox.className = (originalClasses ? originalClasses + " " : "") + "pdf-value-field";
+    valueBox.textContent = field.value || "";
+
+    if(isForkBox){
+      valueBox.style.display = "flex";
+      valueBox.style.alignItems = "center";
+      valueBox.style.justifyContent = "center";
+      valueBox.style.width = field.offsetWidth ? field.offsetWidth + "px" : "";
+      valueBox.style.height = field.offsetHeight ? field.offsetHeight + "px" : "";
+      valueBox.style.minHeight = field.offsetHeight ? field.offsetHeight + "px" : "30px";
+    }else{
+      valueBox.style.display = isTextarea ? "block" : "inline-block";
+      valueBox.style.width = field.offsetWidth ? field.offsetWidth + "px" : "100%";
+      valueBox.style.minHeight = Math.max(field.offsetHeight || 30, 30) + "px";
+    }
+
+    field.replaceWith(valueBox);
+  });
+}
+
+/* ==================================================
+   12. PDF EXPORT ENGINE
+   Canvas-oriented continuous PDF export.
+   ================================================== */
+async 
+function stabilizeForkBoardForPdf(root){
+  const board = root.querySelector("#q3ForkBoard");
+  if(!board) return;
+
+  const wrap = board.closest(".fork-wrap");
+  if(wrap) wrap.classList.add("fork-wrap-pdf-stable");
+
+  board.classList.add("fork-board-pdf-stable");
+  board.style.width = "980px";
+  board.style.minWidth = "980px";
+  board.style.maxWidth = "980px";
+  board.style.height = "768px";
+  board.style.minHeight = "768px";
+  board.style.maxHeight = "768px";
+  board.style.overflow = "visible";
+  board.style.transform = "none";
+
+  const lines = board.querySelector(".fork-lines");
+  if(lines){
+    lines.setAttribute("width", "980");
+    lines.setAttribute("height", "704");
+    lines.style.width = "980px";
+    lines.style.height = "704px";
+    lines.style.left = "0";
+    lines.style.top = "64px";
+    lines.style.overflow = "visible";
+  }
+}
+
+function buildSafePageSlices(root, totalHeight, safeHeight){
+  const protectedSelectors = ["#q3ForkBoard", ".fork-wrap"];
+  const protectedRanges = [];
+
+  protectedSelectors.forEach((selector)=>{
+    root.querySelectorAll(selector).forEach((el)=>{
+      const top = el.offsetTop;
+      const bottom = top + el.offsetHeight;
+      if(bottom > top){
+        protectedRanges.push({top, bottom});
+      }
+    });
+  });
+
+  const slices = [];
+  let start = 0;
+
+  while(start < totalHeight){
+    let end = Math.min(start + safeHeight, totalHeight);
+
+    if(end < totalHeight){
+      const crossing = protectedRanges.find((range)=>start < range.bottom && end > range.top && end < range.bottom);
+      if(crossing){
+        if(crossing.top - start > 900){
+          end = crossing.top;
+        }else if(crossing.bottom - start <= safeHeight){
+          end = crossing.bottom;
+        }
+      }
+    }
+
+    if(end <= start) end = Math.min(start + safeHeight, totalHeight);
+    slices.push({start, end});
+    start = end;
+  }
+
+  return slices;
+}
+
+
+async function replaceForkBoardWithStableImage(sourceRoot, cloneRoot){
+  /*
+    Lab 3 Q3 export fix:
+    The on-screen forked-line board is the source of truth.
+    During PDF export, html2canvas can misalign the SVG connector overlay and cloned/replaced inputs.
+    To avoid that, this function captures the working on-screen board as one stable image
+    and places that image into the export clone.
+  */
+  const sourceBoard = sourceRoot.querySelector("#q3ForkBoard");
+  const cloneBoard = cloneRoot.querySelector("#q3ForkBoard");
+  if(!sourceBoard || !cloneBoard) return;
+
+  const sourceWrap = sourceBoard.closest(".fork-wrap") || sourceBoard;
+  const cloneWrap = cloneBoard.closest(".fork-wrap") || cloneBoard;
+
+  const boardWidth = Math.ceil(sourceBoard.scrollWidth || sourceBoard.getBoundingClientRect().width || 980);
+  const boardHeight = Math.ceil(sourceBoard.scrollHeight || sourceBoard.getBoundingClientRect().height || 768);
+
+  const boardCanvas = await html2canvas(sourceBoard, {
+    scale:2,
+    useCORS:true,
+    allowTaint:true,
+    backgroundColor:"#ffffff",
+    width:boardWidth,
+    height:boardHeight,
+    windowWidth:boardWidth,
+    windowHeight:boardHeight,
+    scrollX:0,
+    scrollY:0
+  });
+
+  const img = document.createElement("img");
+  img.src = boardCanvas.toDataURL("image/png");
+  img.alt = "Question 3 forked-line method workspace";
+  img.style.display = "block";
+  img.style.width = boardWidth + "px";
+  img.style.height = boardHeight + "px";
+  img.style.maxWidth = "none";
+  img.style.border = "0";
+  img.style.margin = "12px 0 22px";
+
+  const stableWrap = document.createElement("div");
+  stableWrap.className = "fork-wrap fork-wrap-pdf-image";
+  stableWrap.style.width = "100%";
+  stableWrap.style.overflow = "visible";
+  stableWrap.style.padding = "10px 0 4px";
+  stableWrap.appendChild(img);
+
+  cloneWrap.replaceWith(stableWrap);
+}
+
+async function exportPDFv1(){
+  const status = document.getElementById("exportStatus");
+  const source = document.getElementById("labForm");
+  const filename = getExportFilename();
+
+  /*
+    Safe-height PDF export:
+    - Short assignments remain one continuous PDF page.
+    - Very tall assignments are split into multiple same-width PDF pages.
+    - Content is not resized, compressed, or redesigned.
+    - This prevents browser/jsPDF limits from chopping the bottom of long labs.
+  */
+  const SAFE_PDF_PAGE_HEIGHT = 6000; // CSS pixels. Conservative limit for reliable PDF pages.
+
+  if(status) status.textContent = "Preparing PDF...";
+
+  let previewWindow = window.open("", "_blank");
+  if(previewWindow){
+    previewWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Preparing PDF...</title>
+        <style>
+          body{
+            margin:0;
+            font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+            background:#eef4ec;
+            color:#14351a;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            min-height:100vh;
+          }
+          .box{
+            background:white;
+            border:2px solid #8abd72;
+            border-radius:20px;
+            padding:28px 36px;
+            box-shadow:0 14px 34px rgba(0,0,0,.16);
+            text-align:center;
+          }
+        </style>
+      </head>
+      <body><div class="box"><h2>Preparing PDF...</h2><p>Please wait.</p></div></body>
+      </html>
+    `);
+    previewWindow.document.close();
+  }
+
+  try{
+    autoGrowTextareas();
+
+    const stage = document.createElement("div");
+    stage.className = "continuous-pdf-stage";
+
+    const clone = source.cloneNode(true);
+    clone.classList.add("single-page-export");
+    syncFormValues(source, clone);
+    try{
+      await replaceForkBoardWithStableImage(source, clone);
+    }catch(q3Err){
+      console.warn("Q3 stable image export fallback:", q3Err);
+    }
+    replaceFieldsForPdf(clone);
+
+    stage.appendChild(clone);
+    document.body.appendChild(stage);
+
+    const width = clone.scrollWidth;
+    const height = clone.scrollHeight;
+
+    const canvas = await html2canvas(clone, {
+      scale:2,
+      useCORS:true,
+      allowTaint:true,
+      backgroundColor:"#ffffff",
+      width:width,
+      height:height,
+      windowWidth:width,
+      windowHeight:height,
+      scrollX:0,
+      scrollY:0
+    });
+
+    document.body.removeChild(stage);
+
+    const { jsPDF } = window.jspdf;
+    const renderScale = canvas.width / width;
+
+    let pdf;
+
+    if(height <= SAFE_PDF_PAGE_HEIGHT){
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+
+      pdf = new jsPDF({
+        orientation: width >= height ? "landscape" : "portrait",
+        unit:"px",
+        format:[width, height],
+        compress:true
+      });
+
+      pdf.addImage(imgData, "JPEG", 0, 0, width, height);
+    }else{
+      const pageSlices = buildSafePageSlices(clone, height, SAFE_PDF_PAGE_HEIGHT);
+      let pageIndex = 0;
+
+      for(const slice of pageSlices){
+        const sourceY = Math.round(slice.start * renderScale);
+        const sliceHeightCanvas = Math.round((slice.end - slice.start) * renderScale);
+        const sliceHeightPdf = slice.end - slice.start;
+
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = sliceHeightCanvas;
+
+        const ctx = pageCanvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(
+          canvas,
+          0, sourceY, canvas.width, sliceHeightCanvas,
+          0, 0, pageCanvas.width, sliceHeightCanvas
+        );
+
+        const pageImgData = pageCanvas.toDataURL("image/jpeg", 0.95);
+
+        if(pageIndex === 0){
+          pdf = new jsPDF({
+            orientation: width >= sliceHeightPdf ? "landscape" : "portrait",
+            unit:"px",
+            format:[width, sliceHeightPdf],
+            compress:true
+          });
+        }else{
+          pdf.addPage([width, sliceHeightPdf], width >= sliceHeightPdf ? "landscape" : "portrait");
+        }
+
+        pdf.addImage(pageImgData, "JPEG", 0, 0, width, sliceHeightPdf);
+
+        pageIndex += 1;
+      }
+    }
+
+    const blob = pdf.output("blob");
+    const pdfUrl = URL.createObjectURL(blob);
+
+    openPdfPreview(previewWindow, pdfUrl, filename);
+
+    if(status) status.textContent = "PDF ready.";
+    setTimeout(()=>{ if(status) status.textContent = ""; }, 2200);
+  }catch(err){
+    console.error(err);
+    if(status) status.textContent = "PDF export failed.";
+    if(previewWindow && !previewWindow.closed){
+      previewWindow.document.body.innerHTML = "<p>PDF export failed. Please return to the assignment and try again.</p>";
+    }
+  }
+}
+
+/* ==================================================
+   13. PDF PREVIEW PAGE
+   ================================================== */
+function openPdfPreview(previewWindow, pdfUrl, filename){
+  if(!previewWindow || previewWindow.closed){
+    const a = document.createElement("a");
+    a.href = pdfUrl;
+    a.download = filename;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(pdfUrl), 60000);
+    return;
+  }
+
+  previewWindow.document.open();
+  previewWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>${filename}</title>
+      <style>
+        body{
+          margin:0;
+          background:#eef4ec;
+          font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+          color:#14351a;
+        }
+        .topbar{
+          position:sticky;
+          top:0;
+          z-index:10;
+          background:linear-gradient(135deg,#14351a,#3c7b35);
+          color:white;
+          padding:12px 18px;
+          display:flex;
+          gap:12px;
+          align-items:center;
+          justify-content:space-between;
+          flex-wrap:wrap;
+          box-shadow:0 8px 24px rgba(0,0,0,.22);
+        }
+        .topbar h1{
+          font-size:1.05rem;
+          margin:0;
+        }
+        .actions{
+          display:flex;
+          gap:10px;
+          flex-wrap:wrap;
+        }
+        button,a.download{
+          border:0;
+          border-radius:999px;
+          background:white;
+          color:#173a1a;
+          padding:9px 14px;
+          font-weight:800;
+          cursor:pointer;
+          text-decoration:none;
+          font-size:.95rem;
+        }
+        a.download{
+          background:#dff4d7;
+        }
+        .instructions{
+          background:white;
+          border-bottom:1px solid #cfe3c9;
+          padding:10px 18px;
+          font-size:.95rem;
+        }
+        iframe{
+          width:100%;
+          height:calc(100vh - 112px);
+          border:0;
+          background:white;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="topbar">
+        <h1>✓ PDF successfully generated</h1>
+        <div class="actions">
+          <a class="download" href="${pdfUrl}" download="${filename}">Download PDF</a>
+          <button onclick="window.close()">Close Preview</button>
+        </div>
+      </div>
+      <div class="instructions">
+        Review your PDF before submitting it to Canvas. Click Download PDF to save your assignment.
+        If your browser is configured to ask where to save downloads, you will be able to choose the destination folder.
+      </div>
+      <iframe src="${pdfUrl}"></iframe>
+    </body>
+    </html>
+  `);
+  previewWindow.document.close();
+  setTimeout(()=>URL.revokeObjectURL(pdfUrl), 60000);
+}
+
+/* ==================================================
+   14. INITIALIZATION
+   ================================================== */
+document.addEventListener("input", (event)=>{
+  if(event.target && event.target.tagName === "TEXTAREA"){
+    autoGrowTextareas();
+  }
+});
+
+window.addEventListener("DOMContentLoaded", ()=>{
+  autoGrowTextareas();
+});
+</script>
+
+<script>
+/* ==================================================
+   15. ASSIGNMENT-SPECIFIC JAVASCRIPT STARTS HERE
+   Copy assignment-specific code below.
+   Do not modify framework code unless updating the BIOL 226 template.
+   ================================================== */
+
+// Example:
+// function buildAssignmentTables(){
+//   ...
+// }
+
+// window.addEventListener("DOMContentLoaded", buildAssignmentTables);
+
+/* ==================================================
+   ASSIGNMENT-SPECIFIC JAVASCRIPT ENDS HERE
+   ================================================== */
+</script>
+
+</body>
+</html>

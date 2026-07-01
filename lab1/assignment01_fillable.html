@@ -864,15 +864,237 @@ input:focus,textarea:focus,select:focus{
   box-shadow: 0 16px 32px rgba(0,0,0,0.28);
 }
 
+
+
+/* PDF export input text clipping fix: gives typed letters enough vertical room */
+@media print{
+  input, textarea, select{
+    line-height:1.25 !important;
+  }
+  input, select{
+    min-height:24px !important;
+    height:auto !important;
+    padding-top:3px !important;
+    padding-bottom:3px !important;
+  }
+}
+.pdf-export-page input,
+.pdf-export-page select{
+  min-height:24px !important;
+  height:auto !important;
+  line-height:1.25 !important;
+  padding-top:3px !important;
+  padding-bottom:3px !important;
+}
+.pdf-export-page textarea{
+  line-height:1.25 !important;
+}
+.pdf-export-page .punnett input,
+.pdf-export-page .fly-fields input,
+.pdf-export-page .scoring-card input,
+.pdf-export-page .model-grid input,
+.pdf-export-page .medium-field{
+  min-height:24px !important;
+  height:auto !important;
+  line-height:1.25 !important;
+}
+
+
+
+/* Continuous Canvas-submission layout v1
+   Structural change: the assignment is no longer treated as letter-sized paper.
+   It is a single responsive web form, and PDF export captures the full form as
+   one tall page for online Canvas grading. */
+.page-break,
+.q2-print-start,
+.q5-print-start,
+.q4-soft-break{
+  display:none !important;
+  height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+}
+.sheet{
+  width:980px;
+  min-width:980px;
+  max-width:980px;
+  margin:24px auto 44px;
+  padding:28px 38px 42px;
+  border-radius:30px;
+}
+.header{
+  margin-bottom:26px;
+}
+.section-title{
+  margin:34px auto 18px;
+  border-radius:10px;
+  background:linear-gradient(180deg,#e9eee7,#d8e0d5);
+}
+.instructions{
+  border-radius:10px;
+  padding:12px 14px;
+  margin:16px 0;
+}
+.hint{
+  max-width:980px;
+  border-radius:14px;
+  padding:14px 18px;
+}
+table{
+  display:table;
+  table-layout:auto;
+}
+
+/* Q1 responsive table containment: keeps the wide notation table inside the sheet on narrow screens. */
+.q1-table-scroll{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  margin:16px 0 22px;
+}
+.q1-table{
+  min-width:980px;
+  margin:0;
+}
+
+textarea{
+  min-height:120px;
+  overflow:hidden;
+}
+.fly-grid{
+  grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
+  align-items:start;
+}
+.fly-card img{
+  height:clamp(180px, 24vw, 245px);
+}
+.punnett-wrap,
+.scoring-grid{
+  align-items:start;
+}
+.final-note{
+  border-radius:14px;
+}
+.continuous-pdf-stage{
+  position:absolute;
+  left:-30000px;
+  top:0;
+  width:980px;
+  background:#fff;
+  z-index:-1;
+}
+.continuous-pdf-stage .sheet,
+.sheet.single-page-export{
+  width:980px !important;
+  min-width:980px !important;
+  max-width:980px !important;
+  margin:0 !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+.pdf-value-field{
+  background:#fbfffb;
+  border:1px solid var(--field-border);
+  border-radius:6px;
+  min-height:30px;
+}
+.pdf-check-field{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  border:1px solid var(--field-border);
+  border-radius:4px;
+  background:#fbfffb;
+  font-family:Arial,sans-serif;
+  font-size:18px;
+  font-weight:bold;
+  line-height:1;
+}
+@media(max-width:850px){
+  .sheet{width:980px; min-width:980px; max-width:980px; margin:12px auto 28px;}
+  .logo{position:static; display:block; margin:0 auto 8px;}
+  .q2-table{font-size:.82rem;}
+  .parental-row img{width:min(260px, 100%); height:auto;}
+}
+@media print{
+  @page{size:auto; margin:0;}
+  body{background:#fff;}
+  .toolbar{display:none !important;}
+  .sheet{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+}
+
+
+/* Fixed-width worksheet standardization: browser window is only a viewport; the worksheet keeps one constant width. */
+:root{--worksheet-width:1120px;}
+body{
+  min-width:calc(var(--worksheet-width) + 40px);
+  overflow-x:auto;
+}
+.sheet{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+  padding:28px 38px 42px !important;
+}
+.continuous-pdf-stage{
+  width:var(--worksheet-width) !important;
+}
+.continuous-pdf-stage .sheet,
+.sheet.single-page-export{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+}
+@media(max-width:850px){
+  body{font-size:18px !important;}
+  .sheet{
+    width:var(--worksheet-width) !important;
+    min-width:var(--worksheet-width) !important;
+    max-width:var(--worksheet-width) !important;
+    padding:28px 38px 42px !important;
+    border-radius:30px !important;
+  }
+  .logo{
+    position:absolute !important;
+    top:10px !important;
+    left:12px !important;
+    width:54px !important;
+    margin:0 !important;
+  }
+  .student-row{
+    display:grid !important;
+    grid-template-columns:auto 1fr auto 150px auto 150px !important;
+  }
+  table{font-size:inherit !important;}
+  th,td{padding:10px 9px !important;}
+  .fly-grid{grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)) !important;}
+  .fly-card img{height:245px !important;}
+  .scoring-grid{grid-template-columns:repeat(3,1fr) !important;}
+  .punnett-wrap{grid-template-columns:1fr 1fr !important;}
+  .model-grid{grid-template-columns:1.1fr 1fr 1fr !important;}
+  .parental-row img{width:260px !important;height:190px !important;}
+}
+
 </style>
 </head>
 <body data-lab="1">
 <div class="toolbar">
   <strong>BIOL 226 Assignment #1</strong>
+  <button onclick="saveProgress()">Save Progress</button>
   <button onclick="loadProgress()">Load Progress</button>
   <button onclick="clearProgress()">Clear Form</button>
   <button onclick="exportPDFv1()">Export PDF</button>
-  <button type="button" onclick="returnToLab()">🏠 Back to Lab 1</button>
   <span id="exportStatus" style="font-size:.9rem;opacity:.9;"></span>
 </div>
 
@@ -896,21 +1118,23 @@ input:focus,textarea:focus,select:focus{
 
   <div class="hint"><b><u>Hint:</u></b> Use the <b>first letter(s) of the mutation’s name</b> as the main symbol for the notation. For example, if the mutation is called “<b><u>sepia</u></b>”, you should use “<b><u>se</u></b>” for the <b><u>mutant</u></b> type and “<b><u>se+</u></b>” for <b><u>wild-type</u></b> flies. Keep in mind the location of the genes on the chromosomes (autosomes vs. sex-linked) and the nature of the mutation (dominant vs. recessive).</div>
 
-  <table>
-    <thead>
-      <tr>
-        <th colspan="3">Phenotype</th>
-        <th colspan="2">Genetic basis</th>
-        <th colspan="4">Notation (<u>homozygous</u> or <u>pure breeding</u>)</th>
-      </tr>
-      <tr>
-        <th>Body part</th><th>Wild type</th><th>Mutation</th>
-        <th>Mutation Type</th><th>Location</th>
-        <th>Male wild</th><th>Male mutant</th><th>Female wild</th><th>Female mutant</th>
-      </tr>
-    </thead>
-    <tbody id="q1body"></tbody>
-  </table>
+  <div class="q1-table-scroll">
+    <table class="q1-table">
+      <thead>
+        <tr>
+          <th colspan="3">Phenotype</th>
+          <th colspan="2">Genetic basis</th>
+          <th colspan="4">Notation (<u>homozygous</u> or <u>pure breeding</u>)</th>
+        </tr>
+        <tr>
+          <th>Body part</th><th>Wild type</th><th>Mutation</th>
+          <th>Mutation Type</th><th>Location</th>
+          <th>Male wild</th><th>Male mutant</th><th>Female wild</th><th>Female mutant</th>
+        </tr>
+      </thead>
+      <tbody id="q1body"></tbody>
+    </table>
+  </div>
 
   <div class="q2-print-start"></div>
   <p class="instructions"><b>2.</b> Based on the <b><u>previous information</u></b>, please assign the <b><u>genotypes</u></b> to the different <b><u>phenotype</u></b> combinations. Assume that all individuals are <b><u>pure breeding lines</u></b> (i.e., homozygous).</p>
@@ -1140,158 +1364,345 @@ function clearProgress(){
 window.addEventListener("DOMContentLoaded", loadProgress);
 </script>
 
-<!-- PDF Export v1: captures the assignment as it appears on screen and slices it into letter-size PDF pages -->
+<!-- PDF Export v1: captures the assignment as it appears on screen as one continuous Canvas-friendly PDF page -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+
+function getExportFilename(){
+  const lab = document.body.dataset.lab || (document.title.match(/Assignment\s*(?:#)?\s*(\d+)/i) || [null,"X"])[1] || "X";
+  const nameField = document.querySelector('[name="student_name"]');
+  const rawName = nameField ? nameField.value.trim() : "";
+  const safeIdentifier = rawName
+    ? rawName
+        .replace(/[\\/:*?"<>|]/g, "")
+        .replace(/[^\w\s.-]/g, "")
+        .trim()
+        .replace(/\s+/g, "_")
+    : "Student";
+  return `Lab${lab}_BIOL226_${safeIdentifier || "Student"}.pdf`;
+}
+
 async function exportPDFv1(){
   const status = document.getElementById("exportStatus");
   const originalSheet = document.querySelector(".sheet");
   const lab = document.body.dataset.lab || (document.title.match(/Assignment\s*(?:#)?\s*(\d+)/i) || [null,"x"])[1];
-  const fileName = "lab" + lab + "_biol226.pdf";
+  const fileName = getExportFilename();
+  const previewWindow = window.open("", "_blank");
+  if(previewWindow){
+    previewWindow.document.open();
+    previewWindow.document.write(`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Preparing PDF...</title>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#eef4ec;color:#173a1a;}
+  .bar{padding:14px 18px;background:linear-gradient(135deg,#14351a,#3c7b35);color:white;font-weight:800;}
+  .message{padding:24px;font-size:1.05rem;}
+
+/* Fixed-width worksheet standardization: browser window is only a viewport; the worksheet keeps one constant width. */
+:root{--worksheet-width:1120px;}
+body{
+  min-width:calc(var(--worksheet-width) + 40px);
+  overflow-x:auto;
+}
+.sheet{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+  padding:28px 38px 42px !important;
+}
+.continuous-pdf-stage{
+  width:var(--worksheet-width) !important;
+}
+.continuous-pdf-stage .sheet,
+.sheet.single-page-export{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+}
+@media(max-width:850px){
+  body{font-size:18px !important;}
+  .sheet{
+    width:var(--worksheet-width) !important;
+    min-width:var(--worksheet-width) !important;
+    max-width:var(--worksheet-width) !important;
+    padding:28px 38px 42px !important;
+    border-radius:30px !important;
+  }
+  .logo{
+    position:absolute !important;
+    top:10px !important;
+    left:12px !important;
+    width:54px !important;
+    margin:0 !important;
+  }
+  .student-row{
+    display:grid !important;
+    grid-template-columns:auto 1fr auto 150px auto 150px !important;
+  }
+  table{font-size:inherit !important;}
+  th,td{padding:10px 9px !important;}
+  .fly-grid{grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)) !important;}
+  .fly-card img{height:245px !important;}
+  .scoring-grid{grid-template-columns:repeat(3,1fr) !important;}
+  .punnett-wrap{grid-template-columns:1fr 1fr !important;}
+  .model-grid{grid-template-columns:1.1fr 1fr 1fr !important;}
+  .parental-row img{width:260px !important;height:190px !important;}
+}
+
+</style>
+</head>
+<body>
+  <div class="bar">BIOL 226 PDF Preview</div>
+  <div class="message">Preparing your PDF preview...</div>
+</body>
+</html>`);
+    previewWindow.document.close();
+  }
+
+  function openPdfPreview(pdf, filename, targetWindow){
+    const pdfBlob = pdf.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const safeFilename = filename.replace(/"/g, "&quot;");
+
+    if(!targetWindow || targetWindow.closed){
+      pdf.save(filename);
+      return;
+    }
+
+    targetWindow.document.open();
+    targetWindow.document.write(`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>${safeFilename}</title>
+<style>
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#eef4ec;color:#173a1a;}
+  .preview-shell{height:100%;display:flex;flex-direction:column;}
+  .preview-header{box-sizing:border-box;padding:14px 18px;background:linear-gradient(135deg,#14351a,#3c7b35);color:white;box-shadow:0 2px 10px rgba(0,0,0,.25);}
+  .preview-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .preview-top strong{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .preview-actions{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;}
+  .preview-actions a,.preview-actions button{border:0;border-radius:999px;background:white;color:#173a1a;text-decoration:none;padding:9px 14px;font-weight:800;font-size:.95rem;cursor:pointer;font-family:inherit;}
+  .preview-actions button{background:#e9f5e5;}
+  .preview-instructions{margin-top:10px;line-height:1.35;font-size:.92rem;opacity:.96;}
+  iframe{width:100%;flex:1;border:0;background:white;}
+
+/* Fixed-width worksheet standardization: browser window is only a viewport; the worksheet keeps one constant width. */
+:root{--worksheet-width:1120px;}
+body{
+  min-width:calc(var(--worksheet-width) + 40px);
+  overflow-x:auto;
+}
+.sheet{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+  padding:28px 38px 42px !important;
+}
+.continuous-pdf-stage{
+  width:var(--worksheet-width) !important;
+}
+.continuous-pdf-stage .sheet,
+.sheet.single-page-export{
+  width:var(--worksheet-width) !important;
+  min-width:var(--worksheet-width) !important;
+  max-width:var(--worksheet-width) !important;
+}
+@media(max-width:850px){
+  body{font-size:18px !important;}
+  .sheet{
+    width:var(--worksheet-width) !important;
+    min-width:var(--worksheet-width) !important;
+    max-width:var(--worksheet-width) !important;
+    padding:28px 38px 42px !important;
+    border-radius:30px !important;
+  }
+  .logo{
+    position:absolute !important;
+    top:10px !important;
+    left:12px !important;
+    width:54px !important;
+    margin:0 !important;
+  }
+  .student-row{
+    display:grid !important;
+    grid-template-columns:auto 1fr auto 150px auto 150px !important;
+  }
+  table{font-size:inherit !important;}
+  th,td{padding:10px 9px !important;}
+  .fly-grid{grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)) !important;}
+  .fly-card img{height:245px !important;}
+  .scoring-grid{grid-template-columns:repeat(3,1fr) !important;}
+  .punnett-wrap{grid-template-columns:1fr 1fr !important;}
+  .model-grid{grid-template-columns:1.1fr 1fr 1fr !important;}
+  .parental-row img{width:260px !important;height:190px !important;}
+}
+
+</style>
+</head>
+<body>
+  <div class="preview-shell">
+    <div class="preview-header">
+      <div class="preview-top">
+        <strong>✓ PDF successfully generated: ${safeFilename}</strong>
+        <div class="preview-actions">
+          <a href="${pdfUrl}" download="${safeFilename}">Download PDF</a>
+          <button type="button" onclick="window.close()">Close Preview</button>
+        </div>
+      </div>
+      <div class="preview-instructions">
+        Review your PDF before submitting it to Canvas.<br>
+        Click Download PDF to save your assignment.<br>
+        If your browser is configured to ask where to save downloads, you will be able to choose the destination folder.
+      </div>
+    </div>
+    <iframe src="${pdfUrl}" title="PDF preview"></iframe>
+  </div>
+  <script>
+    window.addEventListener("beforeunload", function(){
+      try{ URL.revokeObjectURL(${JSON.stringify(pdfUrl)}); }catch(e){}
+    });
+  <\/script>
+</body>
+</html>`);
+    targetWindow.document.close();
+  }
+
+  function autoGrowTextareas(scope){
+    scope.querySelectorAll("textarea").forEach(el => {
+      el.style.height = "auto";
+      el.style.height = Math.max(el.scrollHeight, 96) + "px";
+    });
+  }
 
   function syncFormValues(scope){
     scope.querySelectorAll("input, textarea, select").forEach(el => {
       if(el.type === "checkbox" || el.type === "radio"){
         if(el.checked){ el.setAttribute("checked", "checked"); }
         else{ el.removeAttribute("checked"); }
+      } else if(el.tagName.toLowerCase() === "textarea"){
+        el.textContent = el.value;
+      } else if(el.tagName.toLowerCase() === "select"){
+        Array.from(el.options).forEach(opt => {
+          if(opt.selected){ opt.setAttribute("selected", "selected"); }
+          else{ opt.removeAttribute("selected"); }
+        });
       } else {
         el.setAttribute("value", el.value);
-        if(el.tagName.toLowerCase() === "textarea"){ el.textContent = el.value; }
       }
     });
   }
-  function makePage(){
-    const page = document.createElement("div");
-    page.className = "pdf-export-page";
-    return page;
-  }
-  function pushPage(pages, page, stage){
-    if(page.children.length){
-      pages.push(page);
-    } else {
-      page.remove();
-    }
-    const next = makePage();
-    stage.appendChild(next);
-    return next;
-  }
-  function fitTextareas(scope){
-    scope.querySelectorAll("textarea").forEach(el => {
-      el.style.height = "auto";
-      el.style.height = Math.max(el.scrollHeight, 60) + "px";
-    });
-  }
-  function buildExportPages(clone, stage){
-    const pages = [];
-    let page = makePage();
-    const pageLimit = 1056;
-    stage.appendChild(page);
-    Array.from(clone.children).forEach(node => {
-      if(node.classList && node.classList.contains("page-break")){
-        page = pushPage(pages, page, stage);
+
+  /* Native form controls sometimes render clipped inside canvas/PDF exports.
+     The live form stays untouched; only the temporary export clone receives
+     plain styled value boxes. */
+  function replaceFieldsForPdf(scope){
+    scope.querySelectorAll("input, textarea, select").forEach(el => {
+      const tag = el.tagName.toLowerCase();
+      const type = (el.getAttribute("type") || "text").toLowerCase();
+
+      if(type === "checkbox" || type === "radio"){
+        const box = document.createElement("span");
+        box.className = "pdf-check-field";
+        box.textContent = el.checked ? "✓" : "";
+        el.replaceWith(box);
         return;
       }
-      const added = page.appendChild(node.cloneNode(true));
-      fitTextareas(added);
-      const keepOnFirstPage = pages.length === 0 && added.querySelector && added.querySelector(".q1-phenotype-table");
-      if(page.scrollHeight > pageLimit && page.children.length > 1 && !keepOnFirstPage){
-        page.removeChild(added);
-        page = pushPage(pages, page, stage);
-        fitTextareas(page.appendChild(node.cloneNode(true)));
-      }
+      if(["button","submit","reset","hidden"].includes(type)) return;
+
+      const cs = window.getComputedStyle(el);
+      const isTextarea = tag === "textarea";
+      const replacement = document.createElement(isTextarea ? "div" : "span");
+      replacement.className = "pdf-value-field";
+      replacement.textContent = tag === "select"
+        ? (el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : "")
+        : (el.value || el.textContent || "");
+
+      replacement.style.boxSizing = "border-box";
+      replacement.style.display = isTextarea
+        ? (cs.display === "inline" ? "inline-block" : cs.display)
+        : (cs.display === "block" ? "block" : "inline-block");
+      replacement.style.verticalAlign = cs.verticalAlign === "baseline" ? "middle" : cs.verticalAlign;
+      replacement.style.width = cs.width;
+      replacement.style.minWidth = cs.minWidth;
+      replacement.style.maxWidth = cs.maxWidth;
+      replacement.style.minHeight = isTextarea ? Math.max(el.scrollHeight, 96) + "px" : "30px";
+      replacement.style.margin = cs.margin;
+      replacement.style.border = cs.border;
+      replacement.style.borderRadius = cs.borderRadius;
+      replacement.style.background = cs.backgroundColor;
+      replacement.style.color = cs.color;
+      replacement.style.fontFamily = cs.fontFamily;
+      replacement.style.fontSize = cs.fontSize;
+      replacement.style.fontWeight = cs.fontWeight;
+      replacement.style.fontStyle = cs.fontStyle;
+      replacement.style.textAlign = cs.textAlign;
+      replacement.style.padding = isTextarea ? cs.padding : "0 8px";
+      replacement.style.whiteSpace = isTextarea ? "pre-wrap" : "nowrap";
+      replacement.style.overflow = "hidden";
+      replacement.style.lineHeight = isTextarea ? "1.25" : "30px";
+      el.replaceWith(replacement);
     });
-    pushPage(pages, page, stage);
-    return pages;
   }
+
   try{
-    if(status) status.textContent = "Preparing compact PDF...";
+    if(status) status.textContent = "Preparing one-page Canvas PDF...";
     if(typeof updateQ8BandsField === "function") updateQ8BandsField();
     if(typeof updateQ9BandsField === "function") updateQ9BandsField();
+    autoGrowTextareas(document);
     syncFormValues(document);
+
     const clone = originalSheet.cloneNode(true);
-    clone.classList.remove("sheet");
+    clone.classList.add("single-page-export");
+    clone.querySelectorAll(".page-break, .q2-print-start, .q5-print-start, .q4-soft-break").forEach(el => el.remove());
+
     const stage = document.createElement("div");
-    stage.className = "pdf-export-stage";
+    stage.className = "continuous-pdf-stage";
+    stage.appendChild(clone);
     document.body.appendChild(stage);
-    const pages = buildExportPages(clone, stage);
+
+    autoGrowTextareas(clone);
+    replaceFieldsForPdf(clone);
     await new Promise(resolve => setTimeout(resolve, 250));
 
+    const canvas = await html2canvas(clone, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: "#ffffff",
+      logging: false,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: 980,
+      windowHeight: clone.scrollHeight
+    });
+
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "pt", "letter");
-    pdf.setProperties({ title: fileName, subject: "BIOL 226 Assignment " + lab });
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const margin = 14;
-    const usableW = pageW - margin * 2;
-    const usableH = pageH - margin * 2;
-    for(let i = 0; i < pages.length; i++){
-      if(i > 0) pdf.addPage();
-      const canvas = await html2canvas(pages[i], {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 1100
-      });
-      const imgData = canvas.toDataURL("image/jpeg", 0.92);
-      const scale = Math.min(usableW / canvas.width, usableH / canvas.height);
-      const imgW = canvas.width * scale;
-      const imgH = canvas.height * scale;
-      pdf.addImage(imgData, "JPEG", (pageW - imgW) / 2, margin, imgW, imgH);
-    }
+    const pageWidthPt = 612; // 8.5 inches at 72 pt/in
+    const marginPt = 18;
+    const usableWidthPt = pageWidthPt - marginPt * 2;
+    const imageHeightPt = canvas.height * (usableWidthPt / canvas.width);
+    const pageHeightPt = imageHeightPt + marginPt * 2;
+    const pdf = new jsPDF({ orientation:"p", unit:"pt", format:[pageWidthPt, pageHeightPt], compress:true });
+    pdf.setProperties({ title:fileName, subject:"BIOL 226 Assignment " + lab + " - continuous Canvas submission" });
+    pdf.addImage(canvas.toDataURL("image/jpeg", 0.94), "JPEG", marginPt, marginPt, usableWidthPt, imageHeightPt);
+
     stage.remove();
-    const blob = new File([pdf.output("blob")], fileName, {type:"application/pdf"});
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url, "_blank");
-    if(!win){
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.click();
-    }
-    if(status) status.textContent = "PDF opened.";
-    setTimeout(() => { if(status) status.textContent = ""; }, 2500);
+    openPdfPreview(pdf, fileName, previewWindow);
+    if(status) status.textContent = previewWindow ? "PDF opened in a new tab." : "PDF saved because the preview tab was blocked.";
+    setTimeout(() => { if(status) status.textContent = ""; }, 3000);
   } catch(err){
     console.error(err);
-    const stage = document.querySelector(".pdf-export-stage");
+    const stage = document.querySelector(".continuous-pdf-stage");
     if(stage) stage.remove();
     if(status) status.textContent = "Export failed.";
     alert("PDF export failed. Please try again.");
   }
 }
 
-</script>
-
-
-
-
-
-
-
-
-
-<script>
-function returnToLab(){
-  // Do not save progress and do not close or navigate away from this fillable form.
-  try{
-    if(window.opener && !window.opener.closed){
-      window.opener.name = "biol226_lab1";
-      window.opener.focus();
-      return;
-    }
-  }catch(e){}
-
-  // Fallback: if the original Lab 1 tab was closed/unavailable,
-  // open or reuse one named Lab 1 tab.
-  var lab1Tab = window.open("lab1.html", "biol226_lab1");
-  if(lab1Tab){
-    lab1Tab.focus();
-  }
-}
 </script>
 
 </body>
